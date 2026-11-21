@@ -19,7 +19,7 @@ The analytical pipeline is structured into four core phases:
 3. **Association Rule Mining (Apriori vs. CHARM):** Native Python implementations of breadth-first Apriori and depth-first CHARM algorithms using vertical tidset intersections, demonstrating a 9.27% lossless compaction into Closed Frequent Itemsets (CFIs).
 4. **Predictive Modeling & Clustering:**
    * **CART Decision Tree Classification:** 5-fold stratified cross-validation for depth tuning, holdout test evaluation (61.92% accuracy, 79.60% precision on favorites, 0.6829 ROC-AUC), Gini feature importance analysis, and human-interpretable If-Then production rules.
-   * **DBSCAN Density-Based Clustering:** Empirical $k$-distance elbow calibration ($k=5, \varepsilon=0.4864$), identifying four dense operational manifolds and isolating 300 anomalous matches and Cinderella tournament upsets.
+   * **DBSCAN Density-Based Clustering:** Empirical k-distance elbow calibration (k=5, epsilon=0.4864), identifying four dense operational manifolds and isolating 300 anomalous matches and Cinderella tournament upsets.
 5. **Big Data Scalability Benchmarking:** Comparative performance benchmarking between single-threaded Scikit-learn CPU execution and distributed Apache PySpark ML (`FPGrowth`, `DecisionTreeClassifier`) evaluated across bootstrapped dataset sizes and modeled via Amdahl's Law.
 
 ---
@@ -27,60 +27,64 @@ The analytical pipeline is structured into four core phases:
 ## 2. Step-by-Step Methodology & Pipeline Details
 
 ### Step 1: Data Preprocessing & Feature Engineering
-* **Timestamp Reconstruction:** In the raw dataset (`ATP Dataset_2012-01 to 2017-07_Int_V4.csv`, 14,735 rows), the `Date` column was stored as raw Excel serial date integers (e.g., `42737`). Converted to calendar dates using the epoch $T_0 = \text{1899-12-30}$:
-  $$\text{Match\_Date} = T_0 + \Delta t_{\text{days}}$$
+* **Timestamp Reconstruction:** In the raw dataset (`ATP Dataset_2012-01 to 2017-07_Int_V4.csv`, 14,735 rows), the `Date` column was stored as raw Excel serial date integers (e.g., `42737`). Converted to calendar dates using the epoch `T_0 = 1899-12-30`:
+  ```text
+  Match_Date = 1899-12-30 + timedelta(days=Date)
+  ```
+  This restores chronological continuity from January 1, 2012 to July 16, 2017 without missing dates.
 * **Outcome Integrity:** Verified player name correspondence across `Winner`, `Player1`, and `Player2`. All records exhibited exact matches (7,348 Player 1 wins vs. 7,349 Player 2 wins), confirming a balanced 50/50 baseline.
 * **Missing Value Treatment:** Identified and dropped 38 records (0.26%) lacking player rankings (qualifiers/wildcards) to ensure distance metrics and log-transforms remain mathematically valid. The cleaned dataset retains 14,697 rows (99.74% retention).
 * **Elimination of Redundant Encodings:** Dropped arbitrary float columns (`Tournament_Int`, `Series_Int`, `Court_Int`, `Surface_Int`, `Round_Int`, `Winner_Int`) in favor of authentic categorical descriptors and explicit one-hot encodings.
 * **Engineered Differentials:** Formulated target and continuous features:
-  * `Player1_Won` = $\mathbb{I}[\text{Winner} = \text{Player1}]$
-  * `Favorite_Won` = $1$ if higher-ranked player won, else $0$ (baseline win rate: 67.24%)
-  * `Is_Upset` = $1 - \text{Favorite\_Won}$
-  * `Rank_Diff` = $\text{Rank}_1 - \text{Rank}_2$, and $\text{Abs\_Rank\_Diff} = |\text{Rank}_1 - \text{Rank}_2|$
-  * `Log_Rank1`, `Log_Rank2` = $\ln(1 + \text{Rank}_i)$
-  * `Odds_Ratio` = $\text{Odds}_1 / \text{Odds}_2$
-  * `Implied_Prob_Diff` ($\Delta P$) = $\frac{1}{\text{Odds}_1} - \frac{1}{\text{Odds}_2}$
-  * `Bookmaker_Margin` = $(\frac{1}{\text{Odds}_1} + \frac{1}{\text{Odds}_2}) - 1.0$ (mean commission: $5.94\% \pm 0.40\%$)
+  * `Player1_Won`: Binary indicator (`1` if Winner is Player 1, else `0`)
+  * `Favorite_Won`: Binary indicator (`1` if higher-ranked player won, else `0`; baseline win rate: 67.24%)
+  * `Is_Upset`: `1 - Favorite_Won`
+  * `Rank_Diff`: `Rank_1 - Rank_2`
+  * `Abs_Rank_Diff`: `|Rank_1 - Rank_2|`
+  * `Log_Rank1`, `Log_Rank2`: `ln(1 + Rank_i)`
+  * `Odds_Ratio`: `Odds_1 / Odds_2`
+  * `Implied_Prob_Diff` (Delta P): `(1 / Odds_1) - (1 / Odds_2)`
+  * `Bookmaker_Margin`: `(1 / Odds_1 + 1 / Odds_2) - 1.0` (mean commission: 5.94% ± 0.40%)
 * **Interval Discretization:**
-  * *Rank Tiers:* `Top10` ($r \le 10$), `Top30` ($11 \le r \le 30$), `Top50` ($31 \le r \le 50$), `Top100` ($51 \le r \le 100$), `Beyond100` ($r > 100$).
-  * *Rank Disparity:* `Parity` ($|\Delta r| \le 10$), `Moderate` ($10 < |\Delta r| \le 40$), `Large` ($40 < |\Delta r| \le 100$), `Massive` ($|\Delta r| > 100$).
-  * *Odds Classes:* `Heavy_Favorite` ($O < 1.30$), `Moderate_Favorite` ($1.30 \le O < 1.70$), `Contested` ($1.70 \le O \le 2.20$), `Underdog` ($O > 2.20$).
+  * **Rank Tiers:** `Top10` (r <= 10), `Top30` (11 <= r <= 30), `Top50` (31 <= r <= 50), `Top100` (51 <= r <= 100), `Beyond100` (r > 100)
+  * **Rank Disparity:** `Parity` (|Delta r| <= 10), `Moderate` (10 < |Delta r| <= 40), `Large` (40 < |Delta r| <= 100), `Massive` (|Delta r| > 100)
+  * **Odds Classes:** `Heavy_Favorite` (O < 1.30), `Moderate_Favorite` (1.30 <= O < 1.70), `Contested` (1.70 <= O <= 2.20), `Underdog` (O > 2.20)
 
 ---
 
 ### Step 2: Exploratory Data Analytics (10 Unique Visualizations)
 All 10 plots are exported as vector PDFs with publication styling:
-1. **`plot1_correlation_heatmap.pdf`:** Pearson correlation matrix across 11 features. Inverse relation between odds and implied probabilities ($r = -0.68$), strong correlation of $\Delta P$ with victory ($r = 0.44$), bookmaker margin uncorrelated with outcome ($r = -0.01$).
-2. **`plot2_violin_odds_by_series.pdf`:** Kernel density violin plots across series. Grand Slams display long right-skewed odds tails ($> 8.00$) from 128-player opening draws; Masters 1000 exhibits compact unimodal density ($1.60$--$2.40$).
-3. **`plot3_boxplot_rank_diff_by_round.pdf`:** Monotonic convergence of median ranking disparity from $48.0$ (Round 1) down to $7.0$ (Finals), validating the Competitive Parity Hypothesis.
-4. **`plot4_pairplot_scatter_matrix.pdf`:** $3 \times 3$ bivariate scatter matrix with diagonal distributions, identifying linear separability when $P_1 > 0.65$.
-5. **`plot5_stacked_bar_surface_by_series.pdf`:** 100% stacked bar chart showing hard court predominance ($51.7\%$--$61.3\%$), clay share ($31\%$--$36\%$), and seasonal grass allocation.
-6. **`plot6_hexbin_density_rankings.pdf`:** 2D log-hexagonal binning with upset overlay ($|\Delta R| > 80$), revealing upset concentration where top-20 athletes meet opponents ranked 80--150.
-7. **`plot7_timeseries_match_volume_margin.pdf`:** Dual-axis longitudinal tracking of 66 monthly intervals (2012--2017) showing seasonal major tournament peaks and stable bookmaker margin ($5.6\%$--$6.3\%$).
-8. **`plot8_grouped_bar_favorite_win_rate_ci.pdf`:** Higher-ranked win rates with 95% confidence intervals. Outdoor Clay exhibits highest favorite predictability ($69.8\% \pm 1.1\%$), whereas Indoor Hard exhibits highest upset volatility ($64.5\% \pm 1.5\%$).
+1. **`plot1_correlation_heatmap.pdf`:** Pearson correlation matrix across 11 features. Inverse relation between odds and implied probabilities (r = -0.68), strong correlation of Delta P with victory (r = 0.44), bookmaker margin uncorrelated with outcome (r = -0.01).
+2. **`plot2_violin_odds_by_series.pdf`:** Kernel density violin plots across series. Grand Slams display long right-skewed odds tails (> 8.00) from 128-player opening draws; Masters 1000 exhibits compact unimodal density (1.60 to 2.40).
+3. **`plot3_boxplot_rank_diff_by_round.pdf`:** Monotonic convergence of median ranking disparity from 48.0 (Round 1) down to 7.0 (Finals), validating the Competitive Parity Hypothesis.
+4. **`plot4_pairplot_scatter_matrix.pdf`:** 3x3 bivariate scatter matrix with diagonal distributions, identifying linear separability when P1 > 0.65.
+5. **`plot5_stacked_bar_surface_by_series.pdf`:** 100% stacked bar chart showing hard court predominance (51.7% to 61.3%), clay share (31% to 36%), and seasonal grass allocation.
+6. **`plot6_hexbin_density_rankings.pdf`:** 2D log-hexagonal binning with upset overlay (|Delta R| > 80), revealing upset concentration where top-20 athletes meet opponents ranked 80 to 150.
+7. **`plot7_timeseries_match_volume_margin.pdf`:** Dual-axis longitudinal tracking of 66 monthly intervals (2012 to 2017) showing seasonal major tournament peaks and stable bookmaker margin (5.6% to 6.3%).
+8. **`plot8_grouped_bar_favorite_win_rate_ci.pdf`:** Higher-ranked win rates with 95% confidence intervals. Outdoor Clay exhibits highest favorite predictability (69.8% ± 1.1%), whereas Indoor Hard exhibits highest upset volatility (64.5% ± 1.5%).
 9. **`plot9_pareto_chart_top_winners.pdf`:** Pareto distribution showing elite win concentration. The "Big Four" (Djokovic, Federer, Nadal, Murray) each exceed 250 match wins.
 10. **`plot10_radar_chart_tournament_profiles.pdf`:** 5-dimensional normalized radar chart mapping Best-of-5 share, upset rate, parity, surface diversity, and indoor arena exposure across tiers.
 
 ---
 
 ### Step 3A: Association Rule Mining (Apriori vs. CHARM)
-* **Apriori Algorithm:** Breadth-first candidate generation with vertical bitset/tidset intersection support counting ($\text{tid}(X \cup Y) = \text{tid}(X) \cap \text{tid}(Y)$). At $\text{minsup}=0.05$, $\text{minconf}=0.60$, discovered 1,208 frequent itemsets and 1,508 rules in 0.55 seconds.
+* **Apriori Algorithm:** Breadth-first candidate generation with vertical bitset/tidset intersection support counting (`tid(X union Y) = tid(X) intersect tid(Y)`). At `minsup = 0.05` and `minconf = 0.60`, discovered 1,208 frequent itemsets and 1,508 rules in 0.55 seconds.
 * **CHARM Algorithm:** Depth-first Itemset-Tidset tree (IT-tree) search with four pruning properties (subsumption, equivalence, superset, disjoint). Mined 1,096 Closed Frequent Itemsets (CFIs) and 1,306 rules in 0.58 seconds.
 * **Compaction Analysis:** CHARM achieves a **9.27% reduction in itemsets** and **13.40% reduction in rules** with mathematically **zero information loss** (exact recovery).
-* **Key Finding:** Market odds tiers dominate static ATP rankings in association rules, with heavy favorites yielding rule confidences $> 84\%$ and lifts $> 5.40$.
+* **Key Finding:** Market odds tiers dominate static ATP rankings in association rules, with heavy favorites yielding rule confidences > 84% and lifts > 5.40.
 
 ---
 
 ### Step 3B: Predictive Modeling (CART Decision Tree)
-* **Target:** `Favorite_Won` $\in \{0, 1\}$ (prevents leakage, baseline $67.24\%$).
-* **Cross-Validation:** 5-fold stratified cross-validation over depths $d \in [3, 10]$. Depth $d=6$ selected as optimal ($\text{AUC} = 0.6801 \pm 0.0116$).
-* **Holdout Evaluation (25% test set, $N_{\text{test}} = 3{,}674$):**
-  * Accuracy: **61.92%** ($2,275 / 3,674$)
+* **Target:** `Favorite_Won` in {0, 1} (prevents leakage, baseline 67.24%).
+* **Cross-Validation:** 5-fold stratified cross-validation over depths d in [3, 10]. Depth d=6 selected as optimal (mean AUC = 0.6801 ± 0.0116).
+* **Holdout Evaluation (25% test set, N_test = 3,674):**
+  * Accuracy: **61.92%** (2,275 / 3,674)
   * Precision (Favorite Won): **79.60%**
   * Recall (Favorite Won): **58.30%**
   * Specificity (Upset Detection): **69.35%**
   * ROC-AUC Score: **0.6829**
-  * Optimal Operating Threshold (Youden's $J$): $\text{TPR} = 0.58, \text{FPR} = 0.31$
+  * Optimal Operating Threshold (Youden's J): TPR = 0.58, FPR = 0.31
   * Training Wall-Clock Time: **0.0609 seconds**
 * **Feature Importance:** `Odds_Ratio` dominates with **64.11%** Gini importance, followed by `Implied_Prob_Diff` (9.74%), `Log_Rank1` (7.71%), and `Log_Rank2` (5.20%).
 * **Extracted Rules:** Clean tree visualization rendered to depth 3 (`plot14_decision_tree_structure.pdf`) with extracted human-readable If-Then rules.
@@ -88,26 +92,26 @@ All 10 plots are exported as vector PDFs with publication styling:
 ---
 
 ### Step 3C: Density-Based Spatial Clustering (DBSCAN)
-* **Feature Space:** Standardized $[\text{Log\_Rank1}, \text{Log\_Rank2}, \Delta P, \text{Bookmaker\_Margin}]$.
-* **Parameter Calibration:** Evaluated sorted 5th-nearest neighbor distance curve ($k=5$). The 95th-percentile transition established $\varepsilon = 0.4864, \text{MinPts} = 5$.
+* **Feature Space:** Standardized `[Log_Rank1, Log_Rank2, Implied_Prob_Diff, Bookmaker_Margin]`.
+* **Parameter Calibration:** Evaluated sorted 5th-nearest neighbor distance curve (k=5). The 95th-percentile transition established `epsilon = 0.4864, MinPts = 5`.
 * **Cluster Profiles:**
-  * *Cluster 0 ($n = 14{,}376$, $97.83\%$):* Standard tour core (balanced disparity, $5.95\%$ margin, $67.11\%$ favorite win rate).
-  * *Clusters 2 & 3 ($n = 14$ combined):* Deterministic mismatches ($100.0\%$ favorite wins, $\Delta P > 0.95$, margins $< 2.8\%$).
-  * *Cluster 1 ($n = 5$):* High-commission contested matchups ($60.0\%$ win rate, $6.41\%$ margin).
-  * *Noise Points ($n = 300$, $2.04\%$):* Isolates 69 extreme ranking gaps ($|\Delta r| > 500$), 3 odds anomalies, and 31 high-severity upsets (e.g., R. Ramanathan def. Y. Bhambri at odds 2.75; G. Garcia-Lopez def. G. Muller at French Open).
-* **Validation Scores:** Silhouette $= 0.1563$, Davies-Bouldin $= 0.5474$.
+  * **Cluster 0 (n = 14,376, 97.83%):** Standard tour core (balanced disparity, 5.95% margin, 67.11% favorite win rate).
+  * **Clusters 2 & 3 (n = 14 combined):** Deterministic mismatches (100.0% favorite wins, Delta P > 0.95, margins < 2.8%).
+  * **Cluster 1 (n = 5):** High-commission contested matchups (60.0% win rate, 6.41% margin).
+  * **Noise Points (n = 300, 2.04%):** Isolates 69 extreme ranking gaps (|Delta r| > 500), 3 odds anomalies, and 31 high-severity upsets (e.g., R. Ramanathan def. Y. Bhambri at odds 2.75; G. Garcia-Lopez def. G. Muller at French Open).
+* **Validation Scores:** Silhouette = 0.1563, Davies-Bouldin = 0.5474.
 
 ---
 
 ### Step 3D: Big Data Scalability Analysis
 * **Software Stacks:** Single-threaded Scikit-learn CPU engine vs. Distributed Apache PySpark 3.5 (`VectorAssembler`, `DecisionTreeClassifier`, `FPGrowth`).
 * **Bootstrap Scaling Benchmark:**
-  * Scale $1\times$ ($N = 14{,}695$): Scikit-learn **0.055 s** vs. PySpark 12.014 s (Speedup: $0.005\times$)
-  * Scale $5\times$ ($N = 73{,}475$): Scikit-learn 0.525 s vs. PySpark 12.135 s (Speedup: $0.043\times$)
-  * Scale $10\times$ ($N = 146{,}950$): Scikit-learn 1.115 s vs. PySpark 12.286 s (Speedup: $0.091\times$)
-  * Scale $100\times$ ($N = 1.47\times10^6$, projected): Scikit-learn 11.85 s vs. PySpark 14.12 s (Speedup: $0.839\times$)
-  * Scale $1000\times$ ($N = 1.47\times10^7$, projected): Scikit-learn 142.30 s vs. PySpark **32.45 s** (Speedup: **$4.385\times$**)
-* **Amdahl's Law Interpretation:** At small scales, PySpark incurs a fixed $\approx 12$-second overhead for JVM initialization, thread allocation, and RDD lineage construction. As data scales toward millions of rows, constant overhead becomes negligible, and distributed partitioned memory surpasses single-core CPU limitations.
+  * Scale 1x (N = 14,695): Scikit-learn **0.055 s** vs. PySpark 12.014 s (Speedup: 0.005x)
+  * Scale 5x (N = 73,475): Scikit-learn 0.525 s vs. PySpark 12.135 s (Speedup: 0.043x)
+  * Scale 10x (N = 146,950): Scikit-learn 1.115 s vs. PySpark 12.286 s (Speedup: 0.091x)
+  * Scale 100x (N = 1,469,500, projected): Scikit-learn 11.85 s vs. PySpark 14.12 s (Speedup: 0.839x)
+  * Scale 1000x (N = 14,695,000, projected): Scikit-learn 142.30 s vs. PySpark **32.45 s** (Speedup: **4.385x**)
+* **Amdahl's Law Interpretation:** At small scales, PySpark incurs a fixed ~12-second overhead for JVM initialization, thread allocation, and RDD lineage construction. As data scales toward millions of rows, constant overhead becomes negligible, and distributed partitioned memory surpasses single-core CPU limitations.
 
 ---
 
@@ -220,6 +224,6 @@ pip install numpy pandas scipy scikit-learn matplotlib pymupdf
 A complete archive containing `report.tex` and all 17 vector `.pdf` figures is bundled in `overleaf_project.zip`.
 
 1. Go to [Overleaf.com](https://www.overleaf.com).
-2. Click **New Project** $\rightarrow$ **Upload Project**.
+2. Click **New Project** -> **Upload Project**.
 3. Select `overleaf_project.zip`.
 4. Overleaf automatically unpacks the report and all figures. Click **Recompile** to render the complete academic report.
