@@ -8,7 +8,7 @@ from matplotlib.patches import Patch
 import scipy.stats as stats
 
 # ==============================================================================
-# IEEE TRANSACTIONS / RESEARCH PAPER PUBLICATION STYLING CONFIGURATION
+# Publication TRANSACTIONS / RESEARCH PAPER PUBLICATION STYLING CONFIGURATION
 # ==============================================================================
 plt.rcParams.update({
     'font.family': 'serif',
@@ -36,13 +36,13 @@ CLEAN_FILE = os.path.join(BASE_DIR, "atp_cleaned_transformed.csv")
 df = pd.read_csv(CLEAN_FILE)
 df['Match_Date'] = pd.to_datetime(df['Match_Date'])
 N_TOTAL = len(df)
-print(f"Loaded {N_TOTAL} records for IEEE-standard plot generation.")
+print(f"Loaded {N_TOTAL} records for Publication-standard plot generation.")
 
 # ------------------------------------------------------------------------------
 # PLOT 1: Inter-Attribute Correlation Matrix (Heatmap)
-# IEEE Standard: High contrast, annotated r values, professional colormap
+# Publication-standard: High contrast, annotated r values, professional colormap
 # ------------------------------------------------------------------------------
-print("Plot 1: IEEE Correlation Heatmap...")
+print("Plot 1: Publication Correlation Heatmap...")
 plt.figure(figsize=(8.5, 7.0))
 corr_cols = [
     'Player1_Rank', 'Player2_Rank', 'Rank_Diff', 'Abs_Rank_Diff', 
@@ -81,9 +81,9 @@ plt.close()
 
 # ------------------------------------------------------------------------------
 # PLOT 2: Violin Plot with Embedded Quartile Boxplots
-# IEEE Standard: Clear probability envelopes, explicit median/mean, quartile lines
+# Publication-standard: Clear probability envelopes, explicit median/mean, quartile lines
 # ------------------------------------------------------------------------------
-print("Plot 2: IEEE Violin Distribution of Betting Odds...")
+print("Plot 2: Publication Violin Distribution of Betting Odds...")
 plt.figure(figsize=(9.0, 5.5))
 series_tiers = ['GrandSlam', 'Masters1000', 'ATP500', 'ATP250']
 series_labels = ['Grand Slam\n($n=2,918$)', 'Masters 1000\n($n=3,127$)', 'ATP 500\n($n=2,331$)', 'ATP 250\n($n=6,207$)']
@@ -135,9 +135,9 @@ plt.close()
 
 # ------------------------------------------------------------------------------
 # PLOT 3: Box Plot of Absolute Ranking Parity across Tournament Rounds
-# IEEE Standard: Whisker boundaries, Tukey outlier markers, clear convergence pattern
+# Publication-standard: Whisker boundaries, Tukey outlier markers, clear convergence pattern
 # ------------------------------------------------------------------------------
-print("Plot 3: IEEE Boxplot Ranking Convergence...")
+print("Plot 3: Publication Boxplot Ranking Convergence...")
 plt.figure(figsize=(9.5, 5.5))
 round_order = ['1stRound', '2ndRound', '3rdRound', '4thRound', 'Quarterfinals', 'Semifinals', 'TheFinal']
 round_display = ['Round 1', 'Round 2', 'Round 3', 'Round 4', 'Quarterfinals', 'Semifinals', 'The Final']
@@ -168,9 +168,9 @@ plt.close()
 
 # ------------------------------------------------------------------------------
 # PLOT 4: Multivariate Pairwise Scatter Matrix with KDE Diagonals
-# IEEE Standard: Clear decision boundaries, high-contrast outcome separation
+# Publication-standard: Clear decision boundaries, high-contrast outcome separation
 # ------------------------------------------------------------------------------
-print("Plot 4: IEEE Multivariate Scatter Matrix...")
+print("Plot 4: Publication Multivariate Scatter Matrix...")
 fig, axes = plt.subplots(3, 3, figsize=(9.0, 8.5))
 scatter_vars = ['Player1_Implied_Prob', 'Player2_Implied_Prob', 'Abs_Rank_Diff']
 var_titles = ['P1 Implied Prob ($P_1$)', 'P2 Implied Prob ($P_2$)', '|Rank Diff|']
@@ -219,9 +219,9 @@ plt.close()
 
 # ------------------------------------------------------------------------------
 # PLOT 5: Stacked Percentage Bar Chart
-# IEEE Standard: High contrast color palette, percentage labels centered
+# Publication-standard: High contrast color palette, percentage labels centered
 # ------------------------------------------------------------------------------
-print("Plot 5: IEEE Stacked Percentage Bar Chart...")
+print("Plot 5: Publication Stacked Percentage Bar Chart...")
 plt.figure(figsize=(8.5, 5.5))
 ct = pd.crosstab(df['Series'], df['Surface'], normalize='index') * 100
 series_reindex = ['GrandSlam', 'Masters1000', 'ATP500', 'ATP250']
@@ -256,9 +256,9 @@ plt.close()
 
 # ------------------------------------------------------------------------------
 # PLOT 6: 2D Hexagonal Binning Density Plot with Upset Overlays
-# IEEE Standard: Log10 density scale, distinct outlier markers, publication colormap
+# Publication-standard: Log10 density scale, distinct outlier markers, publication colormap
 # ------------------------------------------------------------------------------
-print("Plot 6: IEEE 2D Hexbin Density Plot...")
+print("Plot 6: Publication 2D Hexbin Density Plot...")
 plt.figure(figsize=(8.5, 6.5))
 hb = plt.hexbin(df['Log_Rank1'], df['Log_Rank2'], gridsize=36, cmap='YlGnBu', mincnt=1, bins='log', edgecolors='none')
 cb = plt.colorbar(hb, pad=0.03)
@@ -282,9 +282,9 @@ plt.close()
 
 # ------------------------------------------------------------------------------
 # PLOT 7: Longitudinal Time-Series Analysis with Dual-Axis Moving Average
-# IEEE Standard: Two distinct y-axes, explicit line styling, grid alignment
+# Publication-standard: Two distinct y-axes, explicit line styling, grid alignment
 # ------------------------------------------------------------------------------
-print("Plot 7: IEEE Time-Series Trend Plot...")
+print("Plot 7: Publication Time-Series Trend Plot...")
 monthly = df.groupby('Year_Month').agg(
     Match_Count=('ATP', 'count'),
     Avg_Margin=('Bookmaker_Margin', 'mean')
@@ -321,9 +321,9 @@ plt.close()
 
 # ------------------------------------------------------------------------------
 # PLOT 8: Clustered Bar Chart with 95% Confidence Intervals
-# IEEE Standard: Error bars explicitly derived from normal approximation, clear value labels
+# Publication-standard: Error bars explicitly derived from normal approximation, clear value labels
 # ------------------------------------------------------------------------------
-print("Plot 8: IEEE Grouped Bar Chart with 95% CI...")
+print("Plot 8: Publication Grouped Bar Chart with 95% CI...")
 plt.figure(figsize=(8.5, 5.5))
 grouped_stats = df.groupby(['Surface', 'Court'])['Favorite_Won'].agg(
     Mean='mean', Count='count', Std='std'
@@ -378,9 +378,9 @@ plt.close()
 
 # ------------------------------------------------------------------------------
 # PLOT 9: Pareto Analysis of Player Victories (Fixed Ticks, No Warnings)
-# IEEE Standard: Explicit 80/20 threshold, dual y-axis scaling, exact tick placement
+# Publication-standard: Explicit 80/20 threshold, dual y-axis scaling, exact tick placement
 # ------------------------------------------------------------------------------
-print("Plot 9: IEEE Pareto Analysis Chart...")
+print("Plot 9: Publication Pareto Analysis Chart...")
 top_winners = df['Winner'].value_counts().head(20)
 cum_pct = (top_winners.cumsum() / top_winners.sum()) * 100.0
 
@@ -411,9 +411,9 @@ plt.close()
 
 # ------------------------------------------------------------------------------
 # PLOT 10: Radar / Polar Architectural Profile Chart
-# IEEE Standard: High-contrast shaded polygons, clear angular ticks, normalized metrics
+# Publication-standard: High-contrast shaded polygons, clear angular ticks, normalized metrics
 # ------------------------------------------------------------------------------
-print("Plot 10: IEEE Radar Profile Chart...")
+print("Plot 10: Publication Radar Profile Chart...")
 radar_features = [
     'Fav Win Rate', 'Upset Frequency', 'Norm Rank Disparity', 'Outdoor Proportion', 'Best-of-5 Ratio'
 ]
@@ -452,5 +452,5 @@ plt.savefig(p10_path, format='pdf')
 plt.close()
 
 print("\n" + "="*70)
-print("ALL 10 IEEE RESEARCH-PAPER STANDARD PLOTS SUCCESSFULLY GENERATED!")
+print("ALL 10 Publication RESEARCH-PAPER STANDARD PLOTS SUCCESSFULLY GENERATED!")
 print("="*70)

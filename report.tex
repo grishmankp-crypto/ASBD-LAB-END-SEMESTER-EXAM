@@ -20,7 +20,7 @@
 \usepackage{url}
 \usepackage{listings}
 \usepackage{xcolor}
-\usepackage[hidelinks]{hyperref}
+\usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue, citecolor=blue]{hyperref}
 
 \graphicspath{{./}{./figures/}}
 
@@ -88,14 +88,14 @@
 
 \begin{document}
 
-\title{Comprehensive Data Mining and Predictive Analytics on ATP Tennis Dynamics with Big Data Scalability Benchmarking}
+\title{Analytics \& Big Data Lab Exam Report on ATP Dataset}
 
 \author{Parate Grishmank Harihar\\[4pt]
 {\normalsize Roll No.\ CS23I1026 \textbullet\ Course: Analytics \& Systems of Big Data (ASBD)\\
 Department of Computer Science and Engineering\\
 Indian Institute of Information Technology, Design and Manufacturing, Kancheepuram\\
 Chennai, Tamil Nadu, India\\
-Repository: \url{https://github.com/grishmankp-crypto/ASBD-LAB-END-SEMESTER-EXAM}}}
+Repository: \textcolor{blue}{\url{https://github.com/grishmankp-crypto/ASBD-LAB-END-SEMESTER-EXAM}}}}}
 
 \markboth{ASBD Laboratory Examination Report, IIITDM Kancheepuram, November 2026}%
 {Harihar: Analytics and Predictive Modeling on ATP Tennis Dynamics}
@@ -126,7 +126,7 @@ The core phases and contributions I completed in this study include:
     \item \textbf{Big Data Architecture Benchmarking:} I conducted formal scalability testing comparing single-node Scikit-learn against Apache PySpark ML (\texttt{FPGrowth}, \texttt{DecisionTreeClassifier}), evaluating the trade-offs of Amdahl's Law in distributed cluster memory.
 \end{enumerate}
 
-All my implementation scripts, preprocessed data files, and high-resolution figures are accessible in my repository: \url{https://github.com/grishmankp-crypto/ASBD-LAB-END-SEMESTER-EXAM}.
+All my implementation scripts, preprocessed data files, and high-resolution figures are accessible in my repository: \textcolor{blue}{\url{https://github.com/grishmankp-crypto/ASBD-LAB-END-SEMESTER-EXAM}}.
 
 % ---------------------------------------------------------------------
 \section{Step 1: Data Preprocessing \& Feature Engineering}
@@ -913,14 +913,41 @@ As $N$ scales from $10^4$ toward $10^7$, constant overhead becomes negligible re
 
 % ---------------------------------------------------------------------
 \section{Conclusion}
-In this laboratory investigation, I implemented an end-to-end descriptive and predictive analytics framework for professional ATP tennis matches:
+In this laboratory examination study, I designed, implemented, and empirically evaluated an end-to-end knowledge discovery and predictive analytics pipeline over five-and-a-half years of professional ATP tennis data ($14,697$ matches from 2012 to 2017). Through this multi-phase analytical investigation, I arrived at several vital data mining and system architecture conclusions:
+
+\subsection{Data Cleaning and Leak-Free Engineering}
+Starting from $14,735$ raw records, I sanitized temporal corruption by reconstructing Excel serial integers into standard calendar dates using the 1899-12-30 epoch. I verified outcome symmetry ($7,348$ vs.\ $7,349$ wins), removed $38$ unranked qualifiers ($99.74\%$ sample retention), and eliminated arbitrary float encodings. Crucially, I engineered continuous differential features ($\Delta P$, rank differentials, logarithmic rank transforms, odds ratios, and bookmaker margins) that eliminate temporal target leakage, while preserving market efficiency indicators. Discretizing continuous attributes into qualitative tiers produced a robust transaction base for pattern discovery.
+
+\subsection{Domain Insights from Exploratory Analytics}
+The ten publication-standard exploratory visualizations revealed distinct athletic and economic dynamics across the professional circuit:
+\begin{enumerate}
+    \item \textbf{Competitive Parity Convergence:} Absolute ranking disparity collapses monotonically from $48.0$ in Round~1 down to $7.0$ in Finals, mathematically confirming the progressive convergence towards athletic equilibrium as tournaments advance.
+    \item \textbf{Market Pricing Consistency:} Dual-axis longitudinal tracking proved that bookmaker commission remains rigorously stable ($\mu = 5.94\% \pm 0.40\%$) across all 66 monthly intervals, proving that betting exchanges operate with high economic efficiency and unbiased probability reflection.
+    \item \textbf{Surface-Dependent Predictability:} Favorite win rates are significantly modulated by court surface velocity. Outdoor Clay demonstrates the highest favorite reliability ($69.8\% \pm 1.1\%$) because slow surfaces diminish serve variance and reward sustained baselining. Conversely, Indoor Hard courts exhibit elevated upset volatility ($64.5\% \pm 1.5\%$) due to rapid conditions favoring aggressive servers.
+    \item \textbf{Pareto Dominance:} Elite tour victories follow a pronounced power-law distribution, where the ``Big Four'' (Djokovic, Federer, Nadal, Murray) each exceed 250 match wins, dominating cumulative tournament success.
+\end{enumerate}
+
+\subsection{Lossless Pattern Mining via CHARM}
+In the association rule mining phase, my vertical tidset implementations highlighted the operational advantages of closed frequent itemset mining:
 \begin{itemize}
-    \item I cleaned and transformed 14,735 raw records into 14,697 analysis-ready matches, isolating an empirical favorite baseline win rate of 67.24\%.
-    \item My ten exploratory visualizations showed parity convergence across tournament rounds, stable bookmaker margins ($\mu = 5.94\%$), and surface-dependent favorite predictability.
-    \item My CHARM implementation reduced 1,208 Apriori frequent itemsets to 1,096 closed itemsets without information loss (a 9.27\% rule compaction).
-    \item My CART classifier reached 61.92\% accuracy, 79.60\% precision on favorites, and 0.6829 ROC-AUC, identifying odds ratio as the dominant predictive feature (64.11\% importance).
-    \item My DBSCAN clustering identified four coherent operational clusters and isolated 300 anomalous matches and major historical upsets.
-    \item My scalability benchmarking verified the Amdahl's Law crossover where distributed Spark architectures surpass single-threaded CPU execution under Big Data scaling.
+    \item Apriori extracted $1,208$ frequent itemsets and $1,508$ association rules with noticeable redundancy across subset combinations.
+    \item CHARM leveraged its four depth-first pruning properties to compress the representation down to $1,096$ closed frequent itemsets and $1,306$ non-redundant rules ($9.27\%$ itemset reduction and $13.40\%$ rule compaction) with mathematically zero information loss.
+    \item Discovered rules confirmed that betting odds tiers dominate static ATP rankings in predicting match outcomes, with heavy favorite odds yielding rule confidences exceeding $84\%$ and lifts above $5.40$.
 \end{itemize}
+
+\subsection{Predictive Machine Learning and Feature Dominance}
+My supervised CART decision tree model, calibrated through 5-fold stratified cross-validation at depth $d=6$, attained an accuracy of $61.92\%$, precision of $79.60\%$ on expected favorites, and an ROC-AUC of $0.6829$ on the unseen 25\% holdout set ($N_{\text{test}} = 3{,}674$). Gini impurity analysis proved that the betting market odds ratio is by far the single most influential predictive feature ($64.11\%$ importance), substantially outperforming static ranking differences ($7.71\%$). The extracted production rules provide transparent, human-auditable logic for sports prediction engines.
+
+\subsection{Manifold Structure and Anomaly Isolation with DBSCAN}
+By calibrating the neighborhood radius $\varepsilon = 0.4864$ from the empirical 95th-percentile $k$-distance elbow ($k=5$), DBSCAN uncovered four dense operational manifolds ($14,395$ clustered matches, $97.96\%$) while isolating $300$ matches as spatial noise ($2.04\%$). The clustering successfully distinguished standard tour matches (Cluster 0, $67.11\%$ favorite win rate) from deterministic mismatches (Clusters 2 and 3, $100.0\%$ favorite victory). Furthermore, diagnostic inspection of the isolated noise partition confirmed that DBSCAN effectively flags genuine tournament anomalies, including severe ranking disparity mismatches and high-profile Cinderella upsets (such as Ramanathan over Bhambri and Garcia-Lopez over Muller).
+
+\subsection{Big Data Scalability and Amdahl's Law Synthesis}
+Finally, my architectural benchmarking comparing single-threaded Scikit-learn CPU execution against distributed Apache PySpark ML illustrated the fundamental trade-offs formalized by Amdahl's Law:
+\begin{itemize}
+    \item At small data volumes ($N \le 1.47 \times 10^5$), single-threaded in-memory CPU processing is dramatically faster ($0.055\text{s}$ vs.\ $12.014\text{s}$) because PySpark incurs a fixed $\approx 12$-second overhead for JVM initialization, thread pool allocation, and RDD lineage construction.
+    \item As dataset scales expand toward Big Data scales ($N \ge 10^6$ to $10^7$ records), constant initialization costs become negligible, allowing PySpark's memory-partitioned cluster execution to surpass single-core CPU memory limitations and achieve projected speedups exceeding $4.38\times$.
+\end{itemize}
+
+In summary, this laboratory project demonstrates that combining rigorous domain-specific preprocessing, dual-tree association mining, interpretable decision trees, density clustering, and distributed big data frameworks produces a cohesive, mathematically verified, and computationally scalable analytics framework.
 
 \end{document}

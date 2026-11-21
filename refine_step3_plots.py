@@ -9,7 +9,7 @@ Updates all Step 3 plots to ensure:
   6. Cluster sample sizes (n), bar values, and anomaly breakdown in profiles (plot17)
   7. Exact timing badges and crossover trend in PySpark benchmark (plot18_19)
 
-All styling strictly follows IEEE / Research Paper guidelines (Times New Roman / Serif,
+All styling strictly follows Research Paper guidelines (Times New Roman / Serif,
 subtle gridlines, high contrast, clean typography, publication palette).
 """
 
@@ -56,7 +56,7 @@ BASE_DIR = r"D:\ASBD-LAB"
 CLEAN_CSV = os.path.join(BASE_DIR, "atp_cleaned_transformed.csv")
 
 print("=" * 72)
-print("REFINING STEP 3 VISUALIZATIONS TO IEEE / PUBLICATION STANDARDS")
+print("REFINING STEP 3 VISUALIZATIONS TO PUBLICATION STANDARDS")
 print("=" * 72)
 
 # Load cleaned dataset
