@@ -219,8 +219,3 @@ pip install numpy pandas scipy scikit-learn matplotlib pymupdf
    *Produces `plot11_12` through `plot18_19` vector PDFs.*
 
 ---
-
-1. Go to [Overleaf.com](https://www.overleaf.com).
-2. Click **New Project** -> **Upload Project**.
-3. Select `overleaf_project.zip`.
-4. Overleaf automatically unpacks the report and all figures. Click **Recompile** to render the complete academic report.
