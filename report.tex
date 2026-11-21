@@ -1,10 +1,10 @@
 % =====================================================================
-%  ASBD Lab End-Semester Report -- IEEE Transactions Two-Column Format
+%  ASBD Lab End-Semester Examination Report
 %  Student: Parate Grishmank Harihar (Roll No. CS23I1026)
 %  Course: Analytics & Systems of Big Data (ASBD)
 %  Institution: Indian Institute of Information Technology, Design and
 %               Manufacturing, Kancheepuram (IIITDM Kancheepuram)
-%  GitHub: https://github.com/grishmankp-crypto/ASBD-LAB-END-SEMESTER-EXAM
+%  Repository: https://github.com/grishmankp-crypto/ASBD-LAB-END-SEMESTER-EXAM
 % =====================================================================
 \documentclass[10pt,journal]{IEEEtran}
 
@@ -25,44 +25,49 @@
 
 \graphicspath{{./}{./figures/}}
 
-% ---------- Code Listings Styling ----------
-\definecolor{codegreen}{rgb}{0.13,0.55,0.13}
-\definecolor{codegray}{rgb}{0.45,0.45,0.45}
+% ---------- Code Listings Styling & Spacing Fixes ----------
+\definecolor{codegreen}{rgb}{0.12,0.50,0.12}
+\definecolor{codegray}{rgb}{0.40,0.40,0.40}
 \definecolor{codepurple}{rgb}{0.55,0.0,0.65}
-\definecolor{codeblue}{rgb}{0.0,0.2,0.7}
-\definecolor{backcolour}{rgb}{0.97,0.98,0.99}
-\definecolor{termback}{rgb}{0.10,0.12,0.14}
-\definecolor{termtext}{rgb}{0.88,0.92,0.95}
+\definecolor{codeblue}{rgb}{0.0,0.25,0.70}
+\definecolor{codeback}{rgb}{0.96,0.97,0.98}
+\definecolor{termback}{rgb}{0.94,0.95,0.96}
+\definecolor{termtext}{rgb}{0.10,0.10,0.10}
+
+\lstset{
+    aboveskip=9pt,
+    belowskip=9pt,
+    abovecaptionskip=5pt,
+    belowcaptionskip=6pt,
+    framesep=4pt,
+    xleftmargin=4pt,
+    xrightmargin=4pt,
+    basicstyle=\ttfamily\scriptsize,
+    breaklines=true,
+    breakatwhitespace=false,
+    captionpos=t,
+    frame=single,
+    keepspaces=true,
+    showstringspaces=false
+}
 
 \lstdefinestyle{pythonstyle}{
-    backgroundcolor=\color{backcolour},   
+    backgroundcolor=\color{codeback},
     commentstyle=\color{codegreen}\itshape,
     keywordstyle=\color{codeblue}\bfseries,
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
-    basicstyle=\ttfamily\scriptsize,
-    breakatwhitespace=false,         
-    breaklines=true,                 
-    captionpos=b,                    
-    keepspaces=true,                 
-    numbers=left,                    
-    numbersep=4pt,                  
-    showspaces=false,                
-    showstringspaces=false,
-    showtabs=false,                  
+    numbers=left,
+    numbersep=5pt,
     tabsize=2,
-    frame=single,
-    rulecolor=\color{black!20}
+    rulecolor=\color{black!30}
 }
 
 \lstdefinestyle{terminalstyle}{
     backgroundcolor=\color{termback},
     basicstyle=\ttfamily\tiny\color{termtext},
-    breaklines=true,
-    frame=single,
-    keepspaces=true,
-    showstringspaces=false,
-    rulecolor=\color{black!50}
+    numbers=none,
+    rulecolor=\color{black!40}
 }
 
 % ---------- Helpers ----------
@@ -82,7 +87,7 @@
 Department of Computer Science and Engineering\\
 Indian Institute of Information Technology, Design and Manufacturing, Kancheepuram\\
 Chennai, Tamil Nadu, India\\
-GitHub Repository: \url{https://github.com/grishmankp-crypto/ASBD-LAB-END-SEMESTER-EXAM}}}
+Repository: \url{https://github.com/grishmankp-crypto/ASBD-LAB-END-SEMESTER-EXAM}}}
 
 \markboth{ASBD Laboratory Examination Report, IIITDM Kancheepuram, November 2026}%
 {Harihar: Analytics and Predictive Modeling on ATP Tennis Dynamics}
@@ -90,55 +95,52 @@ GitHub Repository: \url{https://github.com/grishmankp-crypto/ASBD-LAB-END-SEMEST
 \maketitle
 
 % ---------------------------------------------------------------------
-%  ABSTRACT: ESSENTIAL FOR FORMAL IEEE TRANSACTION PAPERS
-% ---------------------------------------------------------------------
 \begin{abstract}
-Predictive sports analytics and financial betting-market forecasting operate at the confluence of stochastic modeling, econometric game theory, and computational data mining. In this study, an exhaustive end-to-end descriptive and predictive analytics pipeline is deployed over a five-and-a-half-year corpus of 14,697 professional Association of Tennis Professionals (ATP) matches played between 2012 and 2017. The analytical methodology follows a rigorous four-phase pipeline: (1)~data preprocessing comprising noise sanitization, Excel serial date reconstruction, task-relevant continuous differential formulation, and multi-tier interval discretization; (2)~exploratory data analysis utilizing ten distinct, publication-grade visualization techniques grounded in foundational statistical literature; (3)~association rule mining with Apriori and closed frequent itemset mining with CHARM, demonstrating a 9.27\% lossless rule compaction without information loss; and (4)~predictive classification via CART Decision Trees alongside Density-Based Spatial Clustering of Applications with Noise (DBSCAN). On a stratified 25\% holdout set, the CART classifier achieves 61.92\% accuracy, 79.60\% precision on favorites, and 0.6829 ROC-AUC under 5-fold cross-validated depth tuning, establishing decimal odds ratios as the single dominant predictive feature (64.11\% Gini importance). DBSCAN ($\varepsilon = 0.4864$, MinPts $= 5$) extracts four coherent density manifolds and isolates 300 anomalous matches and Cinderella upsets. Finally, big data scalability is benchmarked comparing single-threaded Scikit-learn CPU execution against distributed Apache PySpark ML across $1\times$, $5\times$, and $10\times$ bootstrapped data scales, establishing the computational boundaries governed by Amdahl's Law where distributed parallelization overcomes fixed JVM initialization overheads. Complete commented implementation scripts, execution logs, and vector figures are open-sourced on GitHub.
+Predictive sports analytics and financial betting-market forecasting operate at the confluence of stochastic modeling, econometric game theory, and computational data mining. In this laboratory report, I present an end-to-end descriptive and predictive analytics pipeline developed for a five-and-a-half-year corpus of 14,697 professional Association of Tennis Professionals (ATP) matches played between 2012 and 2017. The analytical methodology follows a rigorous four-phase pipeline: (1)~data preprocessing where I cleaned observational noise, converted Excel integer timestamps into calendar dates, derived leak-free continuous differential metrics, and performed multi-tier interval discretization; (2)~exploratory data analysis using ten distinct publication-grade visualization techniques grounded in foundational statistical literature; (3)~association rule mining where I implemented both Apriori and CHARM algorithms from scratch, showing a 9.27\% lossless rule base compaction without information loss; and (4)~predictive classification via CART Decision Trees alongside Density-Based Spatial Clustering of Applications with Noise (DBSCAN). On a stratified 25\% holdout set, my CART classifier achieves 61.92\% accuracy, 79.60\% precision on favorites, and 0.6829 ROC-AUC under 5-fold cross-validated depth tuning, establishing decimal odds ratios as the single dominant predictive feature (64.11\% Gini importance). DBSCAN ($\varepsilon = 0.4864$, MinPts $= 5$) extracts four coherent density manifolds and isolates 300 anomalous matches and Cinderella upsets. Finally, I benchmarked big data scalability by comparing single-threaded Scikit-learn CPU execution against distributed Apache PySpark ML across $1\times$, $5\times$, and $10\times$ bootstrapped data scales, establishing the computational boundaries governed by Amdahl's Law where distributed parallelization overcomes fixed JVM initialization overheads. Complete commented implementation scripts, execution logs, and vector figures are open-sourced in my repository.
 \end{abstract}
 
-\begin{IEEEkeywords}
-Data mining, predictive analytics, association rule mining, Apriori, CHARM algorithm, closed itemsets, CART decision trees, DBSCAN, PySpark ML, Amdahl's law, tennis analytics.
-\end{IEEEkeywords}
+\vspace{1ex}
+\noindent\textbf{\textit{Keywords}}---Data mining, predictive analytics, association rule mining, Apriori, CHARM algorithm, closed itemsets, CART decision trees, DBSCAN, PySpark ML, Amdahl's law, tennis analytics.
 
 % ---------------------------------------------------------------------
 \section{Introduction}
-\IEEEPARstart{P}{rofessional} tennis represents an exceptional domain for computational data mining, multivariate machine learning, and big data systems. Unlike team sports where individual player actions are confounded by squad interdependencies and substitutions, a professional tennis match is a strictly zero-sum, non-cooperative duel between two individual athletes characterized by measurable physical constraints (court surface velocity, indoor versus outdoor atmospheric conditions) and continuous price discovery through high-liquidity financial betting exchanges~\cite{forrest2005odds}. In these markets, decimal betting odds encode collective market-implied win probabilities, capturing latent parameters such as physiological fatigue, head-to-head psychological match-up advantages, and recent surface-specific form~\cite{clarke2000adjusting}.
+Professional tennis represents an exceptional domain for computational data mining, multivariate machine learning, and big data systems. Unlike team sports where individual player actions are confounded by squad interdependencies and tactical substitutions, a professional tennis match is a strictly zero-sum, non-cooperative duel between two individual athletes characterized by measurable physical constraints (court surface velocity, indoor versus outdoor atmospheric conditions) and continuous price discovery through high-liquidity financial betting exchanges~\cite{forrest2005odds}. In these markets, decimal betting odds encode collective market-implied win probabilities, capturing latent parameters such as physiological fatigue, head-to-head psychological matchup advantages, and recent surface-specific form~\cite{clarke2000adjusting}.
 
-However, raw athletic datasets frequently exhibit severe data quality challenges, including corrupted date encodings, arbitrary categorical float assignments, heavily skewed ranking distributions, and class imbalance between expected victories and competitive upsets. Extracting actionable predictive intelligence requires an end-to-end Knowledge Discovery in Databases (KDD) pipeline. This laboratory investigation studies the ATP Tennis Match Dataset (2012--2017) to fulfill the academic and analytical requirements of the \textit{Analytics \& Systems of Big Data (ASBD)} course at IIITDM Kancheepuram.
+However, raw athletic datasets frequently exhibit severe data quality challenges, including corrupted date encodings, arbitrary categorical float assignments, heavily skewed ranking distributions, and class imbalance between expected victories and competitive upsets. Extracting actionable predictive intelligence requires an end-to-end Knowledge Discovery in Databases (KDD) pipeline. I conducted this laboratory investigation on the ATP Tennis Match Dataset (2012--2017) to fulfill the analytical requirements of the \textit{Analytics \& Systems of Big Data (ASBD)} laboratory examination at IIITDM Kancheepuram.
 
-The core contributions and structural phases of this work include:
+The core phases and contributions I completed in this study include:
 \begin{enumerate}
-    \item \textbf{Preprocessing and Interval Discretization:} Reconstruction of corrupted Excel serial timestamps, elimination of unranked qualifiers, derivation of leak-free target metrics, and discretization of continuous rankings and odds into categorical itemsets.
-    \item \textbf{Publication-Standard Exploratory Analytics:} Implementation of ten unique visualization paradigms meeting IEEE Transactions specifications, complete with academic literature citations and quantitative domain interpretations.
-    \item \textbf{Association Rule Mining (Apriori vs.\ CHARM):} Native implementations of breadth-first Apriori and depth-first CHARM algorithms, demonstrating how vertical tidset search trees yield a 9.27\% lossless rule compaction.
-    \item \textbf{Predictive Classification and Rule Induction:} CART Decision Tree induction with 5-fold cross-validated depth tuning, ROC-AUC calibration, confusion matrix profiling, and extraction of human-interpretable If-Then production rules.
-    \item \textbf{Density-Based Outlier Clustering:} Empirical calibration of DBSCAN parameters via $k$-distance elbow estimation, high-dimensional projection via Principal Component Analysis (PCA), and isolation of major tournament upsets.
-    \item \textbf{Big Data Architecture Benchmarking:} Formal scalability testing comparing single-node Scikit-learn against Apache PySpark ML (\texttt{FPGrowth}, \texttt{DecisionTreeClassifier}), evaluating the trade-offs of Amdahl's Law in distributed cluster memory.
+    \item \textbf{Preprocessing and Interval Discretization:} I converted Excel integer timestamps into standard calendar dates, filtered out unranked entrants, derived leak-free target metrics, and discretized continuous rankings and odds into categorical itemsets.
+    \item \textbf{Exploratory Analytics:} I constructed ten distinct visualization paradigms following established academic literature, providing detailed quantitative interpretations for each.
+    \item \textbf{Association Rule Mining (Apriori vs.\ CHARM):} I built native implementations of breadth-first Apriori and depth-first CHARM algorithms, demonstrating how vertical tidset search trees yield a 9.27\% lossless rule compaction.
+    \item \textbf{Predictive Classification and Rule Induction:} I trained a CART Decision Tree with 5-fold cross-validated depth tuning, ROC-AUC calibration, confusion matrix profiling, and extracted human-interpretable If-Then production rules.
+    \item \textbf{Density-Based Outlier Clustering:} I empirically calibrated DBSCAN parameters via $k$-distance elbow estimation, projected the clusters via Principal Component Analysis (PCA), and isolated tournament upsets.
+    \item \textbf{Big Data Architecture Benchmarking:} I conducted formal scalability testing comparing single-node Scikit-learn against Apache PySpark ML (\texttt{FPGrowth}, \texttt{DecisionTreeClassifier}), evaluating the trade-offs of Amdahl's Law in distributed cluster memory.
 \end{enumerate}
 
-All implementation code, preprocessed datasets, and publication figures are accessible via GitHub: \url{https://github.com/grishmankp-crypto/ASBD-LAB-END-SEMESTER-EXAM}.
+All my implementation scripts, preprocessed data files, and high-resolution figures are accessible in my repository: \url{https://github.com/grishmankp-crypto/ASBD-LAB-END-SEMESTER-EXAM}.
 
 % ---------------------------------------------------------------------
 \section{Step 1: Data Preprocessing \& Feature Engineering}
 
 \subsection{Objective and Problem Formulation}
-The raw dataset comprises 14,735 match observations across 25 heterogeneous attributes. The analytical objective is to sanitize observational noise, eliminate redundant columns, transform corrupted date formats, formulate task-relevant differential features, and discretize continuous variables into transactional itemsets for pattern mining.
+The raw dataset contains 14,735 match observations across 25 heterogeneous attributes. My objective in this initial step was to inspect data quality, resolve corrupted timestamp formats, eliminate redundant attributes, formulate continuous differential features that eliminate data leakage, and discretize continuous variables into discrete transactions for pattern mining.
 
 \subsection{Data Cleaning and Noise Sanitization}
-Initial diagnostic profiling revealed several critical data quality anomalies:
+During my initial data audit, I identified and resolved several critical data quality issues:
 \begin{itemize}
-    \item \textbf{Temporal Distortion:} The \texttt{Date} column was stored as raw Excel serial date integers (e.g., $42737$). This was resolved by epoch transformation using base $T_0 = \text{1899-12-30}$:
+    \item \textbf{Converting Serial Integer Dates to Calendar Dates:} In the raw CSV file, the \texttt{Date} column was stored as raw Excel serial date integers (for example, values like $42737$). I converted these integers into calendar timestamps using the standard Excel epoch $T_0 = \text{1899-12-30}$:
     \begin{equation}
         \text{Match\_Date} = T_0 + \Delta t_{\text{days}}.
     \end{equation}
-    The resulting date index spans strictly from January 1, 2012 to July 16, 2017 without chronological gaps.
-    \item \textbf{Integrity Audit of Outcomes:} Player name matching was audited across \texttt{Winner}, \texttt{Player1}, and \texttt{Player2}. All records exhibited exact string correspondence ($7,348$ Player~1 wins vs.\ $7,349$ Player~2 wins), confirming an unbiased, balanced $50.00\% / 50.00\%$ baseline.
-    \item \textbf{Ranking Anomaly Treatment:} A subset of 38 records ($0.26\%$) contained undefined/null rankings attributable to unranked wildcard entrants and amateur qualifiers. Because undefined ranks distort log-transforms and Euclidean distance metrics, these 38 rows were removed, yielding an analytical dataset of $N = 14{,}697$ matches ($99.74\%$ retention).
-    \item \textbf{Redundancy Elimination:} The raw CSV contained pre-encoded float attributes (\texttt{Tournament\_Int}, \texttt{Series\_Int}, \texttt{Court\_Int}, \texttt{Surface\_Int}, \texttt{Round\_Int}, \texttt{Winner\_Int}). These values represented arbitrary float encodings from external collection harnesses and lacked semantic continuity. They were excised in favor of authentic categorical descriptors and one-hot encodings.
+    This restored the chronological timeline, which spans from January 1, 2012 to July 16, 2017 without missing intervals.
+    \item \textbf{Auditing Match Outcomes:} I audited player names across \texttt{Winner}, \texttt{Player1}, and \texttt{Player2}. I found exact string correspondence across all records, resulting in $7,348$ Player~1 wins and $7,349$ Player~2 wins. This confirmed a balanced $50.00\% / 50.00\%$ baseline.
+    \item \textbf{Filtering Out Unranked Entrants:} I identified 38 match records ($0.26\%$) where player rankings were missing (wildcards and amateur qualifiers). Because missing rankings distort logarithmic transformations and distance calculations in clustering, I dropped these 38 rows. This left $N = 14{,}697$ high-quality match records ($99.74\%$ retention rate).
+    \item \textbf{Removing Redundant Encodings:} The raw file included pre-encoded float columns (\texttt{Tournament\_Int}, \texttt{Series\_Int}, \texttt{Court\_Int}, \texttt{Surface\_Int}, \texttt{Round\_Int}, \texttt{Winner\_Int}). These columns were arbitrary float assignments from earlier collection scripts. I dropped all of them in favor of authentic categorical labels and explicit one-hot encodings.
 \end{itemize}
 
-\subsection{Task-Relevant Feature Selection}
-Let $R_i$, $O_i$, and $P_i$ denote the rank, decimal odds, and implied win probability of Player~$i \in \{1, 2\}$. The derived features used for classification and clustering are listed in Table~\ref{tab:features}. The bookmaker margin (the ``over-round'' or vigorish) represents the commission charged by the betting exchange, exhibiting an empirical mean of $\mu = 5.94\% \pm 0.40\%$.
+\subsection{Task-Relevant Feature Formulation}
+Let $R_i$, $O_i$, and $P_i$ denote the rank, decimal odds, and implied win probability of Player~$i \in \{1, 2\}$. To prevent data leakage while supporting predictive modeling and density clustering, I formulated the mathematical features summarized in Table~\ref{tab:features}. The bookmaker margin (the ``over-round'' or broker commission) exhibits an empirical mean of $\mu = 5.94\% \pm 0.40\%$.
 
 \begin{table}[!t]
 \renewcommand{\arraystretch}{1.15}
@@ -164,33 +166,32 @@ Bookmaker\_Margin & $\left(\frac{1}{O_1} + \frac{1}{O_2}\right) - 1.0$ \\
 \end{table}
 
 \subsection{Data Transformation and Interval Discretization}
-Association rule mining algorithms require discrete transactional items. Continuous attributes were partitioned into mutually exclusive, semantically coherent bins:
+Because association rule mining algorithms require discrete items, I partitioned the continuous variables into mutually exclusive, qualitative categories:
 \begin{itemize}
-    \item \textbf{Ranking Tiers:} \texttt{Top10} ($r \le 10$), \texttt{Top30} ($11 \le r \le 30$), \texttt{Top50} ($31 \le r \le 50$), \texttt{Top100} ($51 \le r \le 100$), and \texttt{Beyond100} ($r > 100$).
-    \item \textbf{Ranking Disparity:} \texttt{Parity} ($|\Delta r| \le 10$), \texttt{Moderate} ($10 < |\Delta r| \le 40$), \texttt{Large} ($40 < |\Delta r| \le 100$), and \texttt{Massive} ($|\Delta r| > 100$).
-    \item \textbf{Odds Classes:} \texttt{Heavy\_Favorite} ($O < 1.30$), \texttt{Moderate\_Favorite} ($1.30 \le O < 1.70$), \texttt{Contested} ($1.70 \le O \le 2.20$), and \texttt{Underdog} ($O > 2.20$).
+    \item \textbf{Player Ranking Tiers:} \texttt{Top10} ($r \le 10$), \texttt{Top30} ($11 \le r \le 30$), \texttt{Top50} ($31 \le r \le 50$), \texttt{Top100} ($51 \le r \le 100$), and \texttt{Beyond100} ($r > 100$).
+    \item \textbf{Ranking Disparity Bins:} \texttt{Parity} ($|\Delta r| \le 10$), \texttt{Moderate} ($10 < |\Delta r| \le 40$), \texttt{Large} ($40 < |\Delta r| \le 100$), and \texttt{Massive} ($|\Delta r| > 100$).
+    \item \textbf{Betting Odds Classes:} \texttt{Heavy\_Favorite} ($O < 1.30$), \texttt{Moderate\_Favorite} ($1.30 \le O < 1.70$), \texttt{Contested} ($1.70 \le O \le 2.20$), and \texttt{Underdog} ($O > 2.20$).
 \end{itemize}
 
 \subsection{Commented Implementation Code (Step 1)}
-The core logic for temporal reconstruction, noise filtering, feature formulation, and transactional discretization is implemented in \texttt{run\_step1\_step2.py}:
+I wrote the preprocessing, date conversion, feature engineering, and discretization logic in \texttt{run\_step1\_step2.py}:
 
-\begin{lstlisting}[style=pythonstyle, caption={Step 1: Python Preprocessing and Feature Engineering Pipeline}]
-# Preprocessing pipeline for ATP Tennis Dataset (2012-2017)
+\begin{lstlisting}[style=pythonstyle, caption={Step 1: Python Preprocessing and Feature Engineering Script}]
 import pandas as pd
 import numpy as np
 
-# 1. Load raw dataset
+# Load the raw ATP dataset
 df = pd.read_csv('atp_tennis.csv')
 
-# 2. Reconstruct Excel serial dates (base: 1899-12-30)
+# Convert Excel serial dates to standard calendar timestamps
 df['Match_Date'] = pd.to_datetime('1899-12-30') + pd.to_timedelta(df['Date'], unit='D')
 
-# 3. Filter noise: eliminate unranked qualifiers
+# Drop 38 rows with missing ranks
 df_clean = df.dropna(subset=['Rank_1', 'Rank_2']).copy()
 df_clean['Rank_1'] = df_clean['Rank_1'].astype(int)
 df_clean['Rank_2'] = df_clean['Rank_2'].astype(int)
 
-# 4. Formulate task-relevant features
+# Create binary targets and rank differentials
 df_clean['Player1_Won'] = (df_clean['Winner'] == df_clean['Player1']).astype(int)
 df_clean['Favorite_Won'] = np.where(
     df_clean['Rank_1'] < df_clean['Rank_2'],
@@ -202,17 +203,19 @@ df_clean['Rank_Diff'] = df_clean['Rank_1'] - df_clean['Rank_2']
 df_clean['Abs_Rank_Diff'] = np.abs(df_clean['Rank_Diff'])
 df_clean['Log_Rank1'] = np.log1p(df_clean['Rank_1'])
 df_clean['Log_Rank2'] = np.log1p(df_clean['Rank_2'])
+
+# Betting market ratios and commission calculation
 df_clean['Odds_Ratio'] = df_clean['Odds_1'] / df_clean['Odds_2']
 df_clean['P1_Implied_Prob'] = 1.0 / df_clean['Odds_1']
 df_clean['P2_Implied_Prob'] = 1.0 / df_clean['Odds_2']
 df_clean['Implied_Prob_Diff'] = df_clean['P1_Implied_Prob'] - df_clean['P2_Implied_Prob']
 df_clean['Bookmaker_Margin'] = (df_clean['P1_Implied_Prob'] + df_clean['P2_Implied_Prob']) - 1.0
 
-# 5. Drop redundant float-encoded attributes
+# Drop redundant float columns
 drop_cols = ['Tournament_Int', 'Series_Int', 'Court_Int', 'Surface_Int', 'Round_Int', 'Winner_Int']
 df_clean.drop(columns=drop_cols, inplace=True, errors='ignore')
 
-# 6. Discretization into categorical transactions
+# Discretize continuous variables into discrete transaction bins
 def bin_rank(r):
     if r <= 10: return 'Top10'
     elif r <= 30: return 'Top30'
@@ -225,9 +228,9 @@ df_clean['Rank2_Tier'] = df_clean['Rank_2'].apply(bin_rank)
 \end{lstlisting}
 
 \subsection{Execution Output and Artifact Generation}
-Executing the preprocessing script yielded the following verified console output:
+When I executed the preprocessing script, I obtained the following verified terminal output:
 
-\begin{lstlisting}[style=terminalstyle, caption={Step 1: Preprocessing and Verification Terminal Output}]
+\begin{lstlisting}[style=terminalstyle, caption={Step 1: Terminal Output from Preprocessing Execution}]
 >>> EXECUTION RUN: run_step1_step2.py
 Loaded raw dataset: 14735 rows, 25 columns.
 Reconstructed dates: Min = 2012-01-01, Max = 2017-07-16 (No temporal gaps).
@@ -242,120 +245,120 @@ Exported: atp_transactions_discretized.csv (2.98 MB, 14697 rows x 9 columns)
 \end{lstlisting}
 
 \subsection{Conclusion on Preprocessing}
-The data preprocessing stage successfully sanitized temporal and categorical noise, confirmed outcome symmetry, preserved $99.74\%$ of records without distortion, and synthesized continuous differentials that eliminate data leakage. The transformed datasets form a verified foundation for exploratory and predictive analytics.
+Through this preprocessing phase, I sanitized observational and temporal noise, confirmed baseline outcome symmetry, retained 99.74\% of valid match records, and created continuous differential features without data leakage. The resulting datasets provide a solid basis for exploratory visualization and predictive modeling.
 
 % ---------------------------------------------------------------------
-\section{Step 2: Exploratory Data Analytics (10 Unique IEEE Visualizations)}
+\section{Step 2: Exploratory Data Analytics (10 Unique Visualizations)}
 
-Ten distinct visualization paradigms were constructed, rigorously formatted to IEEE Transactions standards (dual-column width, serif typography, high-contrast palette), and exported as vector PDF documents. Each figure is detailed below with its academic literature citation, visual design, and quantitative interpretation.
+I generated ten distinct visualization types formatted for standard publication presentation with dual-column proportions, serif typography, high-contrast palettes, and exported as vector PDF files. Each plot is documented below with its formal literature citation and my quantitative findings.
 
 \subsection{Figure 1: Pearson Correlation Heatmap}
 \textbf{Citation:} Friendly, M. (2002). \textit{Corrgrams: Exploratory displays for correlation matrices}. The American Statistician, 56(4), 316--324~\cite{friendly2002corrgrams}.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{plot1_correlation_heatmap.pdf}
+\includegraphics[width=0.98\columnwidth]{plot1_correlation_heatmap.pdf}
 \caption{Pearson correlation matrix across continuous match and betting attributes ($N=14{,}697$). The diverging colorbar encodes linear Pearson correlation coefficients $r \in [-1, 1]$.}
 \label{fig:p1}
 \end{figure}
 
-\textbf{Quantitative Interpretation:} The symmetric correlation matrix (Fig.~\ref{fig:p1}) establishes pairwise linear relationships across 11 continuous features. A strong inverse correlation exists between decimal odds and implied probabilities ($r = -0.68$). Implied probability differential exhibits the strongest linear correlation with match victory ($r = 0.44$), followed by ranking differential ($r = 0.32$). The bookmaker margin is uncorrelated with the outcome ($r = -0.01$), confirming that the broker's commission is extracted uniformly regardless of athlete disparity.
+\textbf{Quantitative Interpretation:} In Fig.~\ref{fig:p1}, I plotted the symmetric correlation matrix $r \in [-1, 1]$ across 11 continuous features. I found a strong inverse correlation between decimal odds and implied probabilities ($r = -0.68$). Implied probability differential exhibits the strongest linear correlation with match victory ($r = 0.44$), followed by ranking differential ($r = 0.32$). The bookmaker margin is uncorrelated with the match outcome ($r = -0.01$), which proves that the bookmaker's commission is charged uniformly regardless of player disparity.
 
 \subsection{Figure 2: Violin Density Plot of Betting Odds by Tournament Tier}
 \textbf{Citation:} Hintze, J. L., \& Nelson, R. D. (1998). \textit{Violin plots: A compound of density and box plots}. The American Statistician, 52(2), 181--184~\cite{hintze1998violin}.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{plot2_violin_odds_by_series.pdf}
+\includegraphics[width=0.98\columnwidth]{plot2_violin_odds_by_series.pdf}
 \caption{Empirical kernel density estimates and embedded interquartile ranges of decimal betting odds across the four tournament prestige tiers.}
 \label{fig:p2}
 \end{figure}
 
-\textbf{Quantitative Interpretation:} The violin plot (Fig.~\ref{fig:p2}) combines kernel density estimation with embedded boxplots. Grand Slam tournaments exhibit severe positive right-skewness with long tails extending past $8.00$, reflecting opening rounds of 128-player draws where top seeds meet qualifiers. Conversely, ATP Masters 1000 and ATP 500 tiers show compact, unimodal distributions centered around $1.60$--$2.40$, reflecting elevated baseline parity in elite draws.
+\textbf{Quantitative Interpretation:} In Fig.~\ref{fig:p2}, I combined kernel density estimates with boxplots across tournament tiers. Grand Slam tournaments display severe positive right-skewness with long tails extending past $8.00$. This reflects early rounds of 128-player draws where top seeds face qualifiers. Conversely, ATP Masters 1000 and ATP 500 tiers show compact, unimodal distributions centered around $1.60$--$2.40$, indicating tighter parity among elite entrants.
 
 \subsection{Figure 3: Ranking Parity Convergence by Tournament Round}
 \textbf{Citation:} Tukey, J. W. (1977). \textit{Exploratory Data Analysis}. Addison-Wesley~\cite{tukey1977eda}.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{plot3_boxplot_rank_diff_by_round.pdf}
+\includegraphics[width=0.98\columnwidth]{plot3_boxplot_rank_diff_by_round.pdf}
 \caption{Boxplot of absolute ranking disparity across sequential tournament rounds, demonstrating monotonic convergence towards competitive balance.}
 \label{fig:p3}
 \end{figure}
 
-\textbf{Quantitative Interpretation:} Evaluating absolute ranking disparity $|R_1 - R_2|$ across tournament progression (Fig.~\ref{fig:p3}) validates the \textit{Competitive Parity Hypothesis}. The median ranking disparity collapses monotonically from $48.0$ in Round~1, to $31.0$ in Round~3, $16.0$ in the quarterfinals, down to $7.0$ in the finals. Outliers in late rounds identify historical Cinderella runs by unseeded players.
+\textbf{Quantitative Interpretation:} In Fig.~\ref{fig:p3}, I examined absolute ranking disparity $|R_1 - R_2|$ across sequential rounds. The data validates the \textit{Competitive Parity Hypothesis}: the median ranking disparity decreases monotonically from $48.0$ in Round~1, to $31.0$ in Round~3, $16.0$ in quarterfinals, down to $7.0$ in finals. The outliers in the later rounds clearly isolate Cinderella tournament runs by unseeded players.
 
 \subsection{Figure 4: Multivariate Pairwise Scatter Matrix}
 \textbf{Citation:} Cleveland, W. S. (1993). \textit{Visualizing Data}. Hobart Press~\cite{cleveland1993visualizing}.
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=0.72\textwidth]{plot4_pairplot_scatter_matrix.pdf}
+\includegraphics[width=0.74\textwidth]{plot4_pairplot_scatter_matrix.pdf}
 \caption{Pairwise scatter matrix evaluating bivariate interactions between implied probabilities and ranking disparity, with class-conditional marginal histograms along the diagonal.}
 \label{fig:p4}
 \end{figure*}
 
-\textbf{Quantitative Interpretation:} A $3 \times 3$ grid evaluating bivariate interactions between $P_1$, $P_2$, and $|\Delta R|$ (Fig.~\ref{fig:p4}). The off-diagonal panels display hyperbolic decision manifolds in $(P_1, P_2)$ coordinate space. The diagonal histograms demonstrate that for $P_1 > 0.65$, clean linear separability emerges between Player~1 victories and defeats.
+\textbf{Quantitative Interpretation:} In Fig.~\ref{fig:p4}, I plotted a $3 \times 3$ matrix of bivariate relationships between $P_1$, $P_2$, and $|\Delta R|$. The off-diagonal panels reveal distinct decision boundaries in $(P_1, P_2)$ coordinate space. The diagonal histograms show that when $P_1 > 0.65$, clean linear separability emerges between Player~1 wins and losses.
 
 \subsection{Figure 5: Court Surface Allocation by Tournament Tier}
 \textbf{Citation:} Few, S. (2009). \textit{Now You See It: Simple Visualization Techniques for Quantitative Analysis}. Analytics Press~\cite{few2009now}.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{plot5_stacked_bar_surface_by_series.pdf}
+\includegraphics[width=0.98\columnwidth]{plot5_stacked_bar_surface_by_series.pdf}
 \caption{100\% stacked bar chart displaying proportional court surface allocation across tournament classifications.}
 \label{fig:p5}
 \end{figure}
 
-\textbf{Quantitative Interpretation:} The 100\% stacked bar chart (Fig.~\ref{fig:p5}) shows that hard courts are the predominant surface ($52.4\%$ Grand Slam, $61.3\%$ Masters 1000, $56.8\%$ ATP 500, $51.7\%$ ATP 250). Clay accounts for approximately one third of events ($31\%$--$36\%$), whereas grass is highly seasonal ($15.8\%$ Grand Slam, $10.9\%$ ATP 250) and completely absent from Masters 1000 tournaments.
+\textbf{Quantitative Interpretation:} In Fig.~\ref{fig:p5}, I quantified court surface distributions across tournament tiers. Hard courts represent the majority surface across all tiers ($52.4\%$ Grand Slam, $61.3\%$ Masters 1000, $56.8\%$ ATP 500, $51.7\%$ ATP 250). Clay accounts for about one-third of tournaments ($31\%$--$36\%$), whereas grass is seasonal ($15.8\%$ Grand Slam, $10.9\%$ ATP 250) and absent from Masters 1000 events.
 
 \subsection{Figure 6: Logarithmic 2D Hexagonal Binning with Upset Overlay}
 \textbf{Citation:} Carr, D. B. et al. (1987). \textit{Scatterplot matrix techniques for large N}. JASA, 82(398), 424--436~\cite{carr1987hexbin}.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{plot6_hexbin_density_rankings.pdf}
+\includegraphics[width=0.98\columnwidth]{plot6_hexbin_density_rankings.pdf}
 \caption{Logarithmic 2D hexagonal tessellation of ranking coordinates with major upset overlay ($|\Delta R| > 80$, red crosses).}
 \label{fig:p6}
 \end{figure}
 
-\textbf{Quantitative Interpretation:} Hexagonal binning resolves severe overplotting across all 14,697 matches in $\ln(1 + R_1)$ versus $\ln(1 + R_2)$ space (Fig.~\ref{fig:p6}). Overlaid red markers show major upsets ($|\Delta R| > 80$). Severe upsets do not occur uniformly: they concentrate heavily where top-20 players encounter opponents ranked between $80$ and $150$, where real athletic disparity is narrower than global ranks suggest.
+\textbf{Quantitative Interpretation:} In Fig.~\ref{fig:p6}, I used hexagonal tessellation to resolve overplotting across all 14,697 matches in $\ln(1 + R_1)$ versus $\ln(1 + R_2)$ space. The overlaid red markers show major upsets ($|\Delta R| > 80$). Rather than being evenly distributed, major upsets concentrate where top-20 players face opponents ranked between $80$ and $150$, where real performance differences are smaller than ranking gaps suggest.
 
 \subsection{Figure 7: Longitudinal Time-Series Analysis of Volume and Margin}
 \textbf{Citation:} Tufte, E. R. (2001). \textit{The Visual Display of Quantitative Information}. Graphics Press~\cite{tufte2001visual}.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{plot7_timeseries_match_volume_margin.pdf}
+\includegraphics[width=0.98\columnwidth]{plot7_timeseries_match_volume_margin.pdf}
 \caption{Dual-axis longitudinal time-series showing monthly ATP match volume (left axis) and bookmaker margin (right axis) from 2012 to 2017.}
 \label{fig:p7}
 \end{figure}
 
-\textbf{Quantitative Interpretation:} Profiling 66 monthly intervals (Fig.~\ref{fig:p7}) reveals multi-modal seasonality corresponding to the Australian Open (January), Roland Garros/Wimbledon (May--July), and the US Open (August--September). The secondary axis demonstrates bookmaker margin stability, oscillating tightly within $[5.6\%, 6.3\%]$, validating market pricing efficiency across the multi-year corpus.
+\textbf{Quantitative Interpretation:} In Fig.~\ref{fig:p7}, I plotted monthly match volumes across 66 intervals from 2012 to 2017 alongside bookmaker margin. The 6-month moving average highlights annual seasonality driven by the Australian Open (January), Roland Garros/Wimbledon (May--July), and the US Open (August--September). The secondary axis shows that the bookmaker margin remained stable between $5.6\%$ and $6.3\%$, confirming consistent market pricing over five years.
 
 \subsection{Figure 8: Clustered Bar Chart with 95\% Confidence Intervals}
 \textbf{Citation:} Wickham, H. (2016). \textit{ggplot2: Elegant Graphics for Data Analysis}. Springer~\cite{wickham2016ggplot2}.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{plot8_grouped_bar_favorite_win_rate_ci.pdf}
+\includegraphics[width=0.98\columnwidth]{plot8_grouped_bar_favorite_win_rate_ci.pdf}
 \caption{Win rate of higher-ranked players across court surfaces and venue environments, bounded by normal-approximation 95\% confidence intervals.}
 \label{fig:p8}
 \end{figure}
 
-\textbf{Quantitative Interpretation:} Compares favorite win rates across Outdoor vs.\ Indoor environments per surface (Fig.~\ref{fig:p8}), with normal approximation error bars ($\text{CI} = \pm 1.96 \cdot \frac{\sigma}{\sqrt{n}}$). Outdoor Clay exhibits the highest predictability for favorites ($69.8\% \pm 1.1\%$), because clay slows ball velocity and reduces serve-dominated randomness. Conversely, Indoor Hard courts exhibit elevated upset volatility ($64.5\% \pm 1.5\%$), where fast courts amplify serve speed.
+\textbf{Quantitative Interpretation:} In Fig.~\ref{fig:p8}, I evaluated higher-ranked favorite win rates across court surfaces and venue environments with 95\% confidence intervals ($\pm 1.96 \cdot \sigma / \sqrt{n}$). Outdoor Clay exhibits the highest favorite predictability ($69.8\% \pm 1.1\%$), because clay slows ball speed and reduces serve-dominated randomness. Conversely, Indoor Hard courts show higher upset rates ($64.5\% \pm 1.5\%$), where fast courts amplify serve dominance.
 
 \subsection{Figure 9: Pareto Analysis of Match Victories}
 \textbf{Citation:} Juran, J. M. (1951). \textit{Quality Control Handbook}. McGraw-Hill~\cite{juran1951quality}.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{plot9_pareto_chart_top_winners.pdf}
+\includegraphics[width=0.98\columnwidth]{plot9_pareto_chart_top_winners.pdf}
 \caption{Pareto frequency histogram of match victories among the top 20 players alongside the cumulative percentage ogive.}
 \label{fig:p9}
 \end{figure}
 
-\textbf{Quantitative Interpretation:} The Pareto chart (Fig.~\ref{fig:p9}) demonstrates power-law concentration of elite success. The ``Big Four'' (Novak Djokovic, Roger Federer, Rafael Nadal, Andy Murray) lead the distribution with over 250 wins each, accounting for a disproportionate share of total tour victories.
+\textbf{Quantitative Interpretation:} In Fig.~\ref{fig:p9}, I examined the distribution of wins among top players. The ``Big Four'' (Novak Djokovic, Roger Federer, Rafael Nadal, Andy Murray) lead the chart with over 250 match wins each, demonstrating a clear Pareto concentration where a small cohort of elite athletes capture a large fraction of total victories.
 
 \subsection{Figure 10: Multi-Attribute Radar Profiles}
 \textbf{Citation:} Chambers, J. M. et al. (1983). \textit{Graphical Methods for Data Analysis}. Wadsworth~\cite{chambers1983graphical}.
@@ -367,10 +370,10 @@ Ten distinct visualization paradigms were constructed, rigorously formatted to I
 \label{fig:p10}
 \end{figure}
 
-\textbf{Quantitative Interpretation:} Radar charts (Fig.~\ref{fig:p10}) map five normalized attributes across tiers. Grand Slams dominate in best-of-five endurance and rank disparity, Masters 1000 events form compact polygons reflecting high competitive parity, and ATP 250 events show elevated upset frequency and indoor arena exposure.
+\textbf{Quantitative Interpretation:} In Fig.~\ref{fig:p10}, I mapped five normalized attributes across tournament tiers. Grand Slams lead in best-of-five endurance and ranking disparity, Masters 1000 events show tight shapes reflecting high competitive parity, and ATP 250 tournaments show higher upset frequency and more indoor play.
 
 \subsection{Conclusion on Exploratory Analytics}
-The exploratory visual analytics verified that match predictability is heavily modulated by court surface and tournament prestige. The bookmaker margin remains rigorously constant ($\approx 5.94\%$), confirming that betting odds serve as unbiased proxies for probability estimation in predictive modeling.
+The exploratory analysis revealed that match outcomes are strongly influenced by court surface and tournament tier. The bookmaker margin remained stable ($\mu \approx 5.94\%$), confirming that decimal odds reflect market consensus probabilities and can serve as reliable features for machine learning.
 
 % ---------------------------------------------------------------------
 \section{Step 3A: Association Rule Mining (Apriori vs.\ CHARM)}
@@ -384,31 +387,30 @@ Association Rule Mining (ARM) discovers implicative patterns $X \Rightarrow Y$ w
     \mathrm{Conv}(X \Rightarrow Y) &= \frac{1 - s(Y)}{1 - \mathrm{Conf}(X \Rightarrow Y)}.
 \end{align}
 
-\subsection{The Apriori Algorithm}
-Apriori enforces the anti-monotone downward-closure property: all non-empty subsets of a frequent itemset must also be frequent. While classical implementations repeatedly scan $\mathcal{D}$ for each candidate size $k$, our native Python engine implements \textbf{tidset-accelerated support counting}. Singletons are mapped to bitsets of transaction IDs:
+\subsection{Apriori Algorithm Implementation}
+Apriori uses the downward-closure property: all non-empty subsets of a frequent itemset must also be frequent. Instead of scanning the full dataset repeatedly for each candidate size $k$, I built a native Python implementation that uses \textbf{vertical tidset support counting}. Single items are mapped to sets of transaction IDs:
 \begin{equation}
     \mathrm{tid}(X \cup Y) = \mathrm{tid}(X) \cap \mathrm{tid}(Y).
 \end{equation}
-With $\text{minsup} = 0.05$ (734 matches), $\text{minconf} = 0.60$, and $\text{minlift} = 1.10$, Apriori identified 1,208 frequent itemsets ($k=1$ to $6$) in 0.55~s and produced 1,508 association rules.
+With $\text{minsup} = 0.05$ (734 matches), $\text{minconf} = 0.60$, and $\text{minlift} = 1.10$, Apriori identified 1,208 frequent itemsets ($k=1$ to $6$) in 0.55~s and generated 1,508 association rules.
 
-\subsection{The CHARM Algorithm for Closed Frequent Itemsets}
-A major drawback of classical Apriori is rule redundancy: if itemset $X$ is frequent, all $2^{|X|} - 2$ subsets are also frequent, producing many redundant rules. An itemset $X$ is defined as a \textbf{Closed Frequent Itemset (CFI)} if no proper superset has identical support:
+\subsection{CHARM Algorithm for Closed Itemset Mining}
+A major issue with Apriori is rule redundancy: if an itemset $X$ is frequent, all its $2^{|X|} - 2$ subsets are also frequent, creating many duplicate rules. An itemset $X$ is a \textbf{Closed Frequent Itemset (CFI)} if no proper superset has identical support:
 \begin{equation}
     X \in \mathcal{CFI} \iff \forall Y \supset X, \quad s(Y) < s(X).
 \end{equation}
-CHARM~\cite{zaki2002charm} searches an Itemset-Tidset tree (IT-tree) depth-first and applies four pruning properties:
+I implemented CHARM~\cite{zaki2002charm} using a depth-first search on an Itemset-Tidset tree (IT-tree) with four pruning properties:
 \begin{itemize}
     \item \textbf{Property 1 (Subsumption):} If $\mathrm{tid}(X_i) \subset \mathrm{tid}(X_j)$, replace $X_i$ with $X_i \cup X_j$.
     \item \textbf{Property 2 (Equivalence):} If $\mathrm{tid}(X_i) = \mathrm{tid}(X_j)$, merge both into $X_i \cup X_j$ and prune $X_j$.
     \item \textbf{Property 3 (Superset):} If $\mathrm{tid}(X_i) \supset \mathrm{tid}(X_j)$, extend $X_j$ with $X_i$.
-    \item \textbf{Property 4 (Disjoint):} If neither tidset contains the other, explore the union as a distinct branch.
+    \item \textbf{Property 4 (Disjoint):} If neither tidset contains the other, branch on their union.
 \end{itemize}
 
 \subsection{Commented Implementation Code (CHARM Engine)}
-The native CHARM engine implemented in \texttt{step3\_apriori\_charm.py} uses depth-first IT-tree traversal:
+I implemented the CHARM engine in \texttt{step3\_apriori\_charm.py}:
 
-\begin{lstlisting}[style=pythonstyle, caption={Step 3A: Native Python Implementation of the CHARM Algorithm}]
-# Native CHARM algorithm using vertical tidset intersections
+\begin{lstlisting}[style=pythonstyle, caption={Step 3A: Python Implementation of the CHARM Algorithm}]
 def charm_extend(nodes, min_supp_count, closed_itemsets):
     # Sort nodes by support ascending
     nodes.sort(key=lambda x: len(x[1]))
@@ -421,16 +423,16 @@ def charm_extend(nodes, min_supp_count, closed_itemsets):
             tid_ij = tid_i.intersection(tid_j)
             
             if len(tid_ij) >= min_supp_count:
-                # Property 1: tidset equality -> replace Xi with Xij
+                # Property 1: equal tidsets -> replace Xi with Xij
                 if tid_i == tid_j:
                     X_i = X_ij
-                # Property 2: tid_i subset of tid_j
+                # Property 2: tid_i is subset of tid_j
                 elif tid_i.issubset(tid_j):
                     X_i = X_ij
-                # Property 3: tid_j subset of tid_i
+                # Property 3: tid_j is subset of tid_i
                 elif tid_j.issubset(tid_i):
                     new_nodes.append((X_ij, tid_ij))
-                # Property 4: incomparability -> explore branch
+                # Property 4: incomparable tidsets
                 else:
                     new_nodes.append((X_ij, tid_ij))
                     
@@ -444,7 +446,7 @@ def charm_extend(nodes, min_supp_count, closed_itemsets):
 \end{lstlisting}
 
 \subsection{Execution Output and Comparative Performance}
-Table~\ref{tab:arm_comp} summarizes the performance comparison between Apriori and CHARM. The verified terminal log is shown below:
+Table~\ref{tab:arm_comp} compares Apriori and CHARM. The terminal log from my execution is shown below:
 
 \begin{lstlisting}[style=terminalstyle, caption={Step 3A: Association Rule Mining Terminal Execution Log}]
 >>> EXECUTION RUN: step3_apriori_charm.py
@@ -465,7 +467,7 @@ Exported: step3a_arm_results.txt
 
 \begin{table}[!t]
 \renewcommand{\arraystretch}{1.15}
-\caption{Algorithmic Comparison: Apriori vs.\ CHARM on ATP Transactions}
+\caption{Comparison of Apriori and CHARM on ATP Transactions}
 \label{tab:arm_comp}
 \centering
 \footnotesize
@@ -507,16 +509,16 @@ Information Loss & None & \textbf{Zero Loss (Exact Reconstitution)} \\
 \end{table*}
 
 \subsection{Interpretation of Discovered Rules and Conclusion}
-Table~\ref{tab:top_rules} shows the top closed association rules ranked by Lift. Rules containing \texttt{Heavy\_Favorite} predict match victories with confidence exceeding 84\% and lift $> 5.40$, proving that betting odds incorporate unmeasured variables (fatigue, head-to-head records) far more effectively than static rankings. CHARM successfully compacted the rule set by 9.27\% without losing any predictive information.
+Table~\ref{tab:top_rules} shows the top closed rules ranked by Lift. Rules containing \texttt{Heavy\_Favorite} predict victories with confidence above 84\% and lift $> 5.40$. This indicates that market odds capture real-world conditions (such as injuries and head-to-head records) more effectively than static rankings. CHARM successfully reduced the rule set by 9.27\% without losing any predictive information.
 
 % ---------------------------------------------------------------------
 \section{Step 3B: Predictive Modeling via CART Decision Trees}
 
 \subsection{Objective and Formulation}
-The supervised learning objective is formulated to predict whether the higher-ranked athlete wins the match (\texttt{Favorite\_Won} $\in \{0, 1\}$). This formulation avoids trivial data leakage while reflecting the natural predictability of the tour ($67.23\%$ favorite win rate vs.\ $32.77\%$ upset rate).
+I formulated the supervised classification task to predict whether the higher-ranked player wins the match (\texttt{Favorite\_Won} $\in \{0, 1\}$). This formulation avoids target leakage and reflects the natural predictability of professional matches (a $67.23\%$ favorite win rate versus a $32.77\%$ upset rate).
 
 \subsection{Cross-Validation and Hyperparameter Calibration}
-To prevent overfitting while preserving interpretability, hyperparameter tuning was conducted using 5-fold stratified cross-validation over tree depth $d \in [3, 10]$ under Gini split impurity and balanced class weighting. As shown in Table~\ref{tab:cv_depth}, depth $d=6$ achieves the optimal tradeoff, maximizing ROC-AUC ($0.6801 \pm 0.0116$).
+To prevent overfitting while keeping the tree interpretable, I performed 5-fold stratified cross-validation over tree depths $d \in [3, 10]$ using Gini impurity and balanced class weights. As shown in Table~\ref{tab:cv_depth}, depth $d=6$ yielded the best trade-off, achieving the highest ROC-AUC ($0.6801 \pm 0.0116$).
 
 \begin{table}[!t]
 \renewcommand{\arraystretch}{1.15}
@@ -540,39 +542,34 @@ To prevent overfitting while preserving interpretability, hyperparameter tuning 
 \end{table}
 
 \subsection{Commented Implementation Code (CART)}
-The Decision Tree cross-validation, training, and rule extraction script is implemented in \texttt{step3\_decision\_tree.py}:
+I implemented the decision tree training and rule extraction script in \texttt{step3\_decision\_tree.py}:
 
-\begin{lstlisting}[style=pythonstyle, caption={Step 3B: CART Decision Tree Training and Holdout Evaluation}]
-# CART Decision Tree pipeline with 5-fold cross-validation
-from sklearn.tree import DecisionTreeClassifier, export_text
+\begin{lstlisting}[style=pythonstyle, caption={Step 3B: CART Decision Tree Training and Holdout Evaluation Script}]
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
-# 1. Feature selection (preventing target leakage)
+# Select features avoiding leakage
 features = ['Odds_Ratio', 'Implied_Prob_Diff', 'Log_Rank1', 'Log_Rank2', 
             'Abs_Rank_Diff', 'Bookmaker_Margin', 'Series_GrandSlam', 
             'Series_Masters1000', 'Court_Outdoor', 'Surface_Clay', 'Surface_Hard']
 X = df[features]
 y = df['Favorite_Won']
 
-# 2. Stratified train-test split (75% train, 25% holdout)
+# Split 75% train and 25% test stratified by target
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=42, stratify=y
 )
 
-# 3. 5-Fold Cross-Validation for optimal depth
-cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-best_depth = 6  # Derived from CV tuning
-
-# 4. Fit final model on training set
+# Fit final CART model at optimal cross-validated depth d=6
 clf = DecisionTreeClassifier(
-    max_depth=best_depth, 
+    max_depth=6, 
     class_weight='balanced', 
     random_state=42
 )
 clf.fit(X_train, y_train)
 
-# 5. Evaluate on holdout test partition
+# Evaluate on holdout test set
 y_pred = clf.predict(X_test)
 y_prob = clf.predict_proba(X_test)[:, 1]
 test_acc = accuracy_score(y_test, y_pred)
@@ -580,7 +577,7 @@ test_auc = roc_auc_score(y_test, y_prob)
 \end{lstlisting}
 
 \subsection{Execution Output and Holdout Evaluation}
-The final model was evaluated on the stratified 25\% holdout set ($N_{\text{test}} = 3{,}674$). Metrics are reported in Table~\ref{tab:test_metrics}, and the verified console log is given below:
+I evaluated the final model on the 25\% holdout set ($N_{\text{test}} = 3{,}674$). Performance metrics are reported in Table~\ref{tab:test_metrics}, and my terminal output is shown below:
 
 \begin{lstlisting}[style=terminalstyle, caption={Step 3B: Decision Tree Training and Evaluation Terminal Output}]
 >>> EXECUTION RUN: step3_decision_tree.py
@@ -630,7 +627,7 @@ Training Wall-Clock Time & 0.0609 seconds \\
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=0.92\textwidth]{plot11_12_decision_tree_roc_cm.pdf}
+\includegraphics[width=0.88\textwidth]{plot11_12_decision_tree_roc_cm.pdf}
 \caption{Receiver Operating Characteristic (ROC) curve (left) with annotated optimal Youden's $J$ operating threshold, and empirical confusion matrix (right) displaying percentage distributions on the holdout test set.}
 \label{fig:p11_12}
 \end{figure*}
@@ -640,7 +637,7 @@ Gini impurity reduction rankings (Fig.~\ref{fig:p13}) show that \texttt{Odds\_Ra
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{plot13_decision_tree_feature_importance.pdf}
+\includegraphics[width=0.98\columnwidth]{plot13_decision_tree_feature_importance.pdf}
 \caption{Top 12 CART feature importances based on Gini impurity reduction.}
 \label{fig:p13}
 \end{figure}
@@ -662,65 +659,64 @@ Fig.~\ref{fig:p14} displays the tree rendered cleanly at depth 3. Three extracte
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=0.96\textwidth]{plot14_decision_tree_structure.pdf}
+\includegraphics[width=0.92\textwidth]{plot14_decision_tree_structure.pdf}
 \caption{Pruned CART Decision Tree architecture ($d=3$) displaying non-overlapping nodes, split conditions, sample counts, and class assignments.}
 \label{fig:p14}
 \end{figure*}
 
 \subsection{Conclusion on Decision Tree Modeling}
-The CART model demonstrates that market odds ratios dominate static ATP rankings in predicting match outcomes. By tuning the tree to depth $d=6$, the model balances high precision ($79.60\%$) with robust generalization ($\text{AUC} = 0.6829$).
+The CART model demonstrates that market odds ratios dominate static ATP rankings in predicting match outcomes. By tuning the tree to depth $d=6$, I balanced high precision on favorites ($79.60\%$) with solid generalization ($\text{AUC} = 0.6829$).
 
 % ---------------------------------------------------------------------
 \section{Step 3C: Density-Based Clustering (DBSCAN)}
 
 \subsection{Objective and Formulation}
-Unlike partitioning methods ($k$-Means), DBSCAN discovers arbitrarily shaped clusters based on local point density while isolating spatial noise~\cite{ester1996dbscan}. Four continuous features were standardized: $[\text{Log\_Rank1}, \text{Log\_Rank2}, \Delta P, \text{Bookmaker\_Margin}]$.
+Unlike partitioning methods like $k$-Means, DBSCAN discovers arbitrarily shaped clusters based on local point density while isolating spatial noise~\cite{ester1996dbscan}. I standardized four continuous features: $[\text{Log\_Rank1}, \text{Log\_Rank2}, \Delta P, \text{Bookmaker\_Margin}]$.
 
 \subsection{Parameter Calibration via K-Distance Estimation}
-The neighborhood radius $\varepsilon$ was determined from the empirical $k$-distance curve ($k = \text{MinPts} = 5$). In Fig.~\ref{fig:p15}, the sorted 5th-nearest neighbor distance curve exhibits its characteristic transition at the 95th percentile, establishing:
+I determined the neighborhood radius $\varepsilon$ from the sorted $k$-distance curve ($k = \text{MinPts} = 5$). In Fig.~\ref{fig:p15}, the sorted 5th-nearest neighbor distance curve exhibits its transition at the 95th percentile, giving:
 \begin{equation}
     \varepsilon = 0.4864, \qquad \text{MinPts} = 5.
 \end{equation}
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{plot15_dbscan_kdistance.pdf}
+\includegraphics[width=0.98\columnwidth]{plot15_dbscan_kdistance.pdf}
 \caption{Sorted 5-nearest neighbor distance graph for empirical DBSCAN radius ($\varepsilon$) calibration, identifying the elbow at the 95th percentile.}
 \label{fig:p15}
 \end{figure}
 
 \subsection{Commented Implementation Code (DBSCAN)}
-The clustering and outlier isolation script is implemented in \texttt{step3\_dbscan.py}:
+I implemented the clustering and outlier isolation script in \texttt{step3\_dbscan.py}:
 
-\begin{lstlisting}[style=pythonstyle, caption={Step 3C: DBSCAN Parameter Calibration and Clustering}]
-# DBSCAN clustering and anomaly isolation pipeline
+\begin{lstlisting}[style=pythonstyle, caption={Step 3C: DBSCAN Parameter Calibration and Clustering Script}]
 from sklearn.cluster import DBSCAN
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_score, davies_bouldin_score
 
-# 1. Standardize continuous features
+# Standardize continuous features
 features = ['Log_Rank1', 'Log_Rank2', 'Implied_Prob_Diff', 'Bookmaker_Margin']
 X_scaled = StandardScaler().fit_transform(df[features])
 
-# 2. Derive epsilon via k-distance elbow (k=5)
+# Compute 5-NN distance to find optimal epsilon
 neighbors = NearestNeighbors(n_neighbors=5).fit(X_scaled)
 distances, _ = neighbors.kneighbors(X_scaled)
 k_distances = np.sort(distances[:, 4])
-eps_opt = float(np.percentile(k_distances, 95))  # 0.4864
+eps_opt = float(np.percentile(k_distances, 95))  # eps = 0.4864
 
-# 3. Fit DBSCAN model
+# Fit DBSCAN with calibrated parameters
 db = DBSCAN(eps=eps_opt, min_samples=5).fit(X_scaled)
 labels = db.labels_
 
-# 4. Compute cluster quality indices on core points
+# Evaluate silhouette and Davies-Bouldin index on clustered points
 core_mask = labels != -1
 sil = silhouette_score(X_scaled[core_mask], labels[core_mask])
 db_index = davies_bouldin_score(X_scaled[core_mask], labels[core_mask])
 \end{lstlisting}
 
 \subsection{Execution Output and Cluster Profiles}
-DBSCAN partitioned the 14,695 valid observations into \textbf{four dense clusters} ($14,395$ matches, $97.96\%$) and \textbf{300 noise points} ($2.04\%$). The terminal log is shown below:
+DBSCAN partitioned the 14,695 valid observations into \textbf{four dense clusters} ($14,395$ matches, $97.96\%$) and \textbf{300 noise points} ($2.04\%$). The terminal log from my execution is shown below:
 
 \begin{lstlisting}[style=terminalstyle, caption={Step 3C: DBSCAN Clustering Terminal Execution Log}]
 >>> EXECUTION RUN: step3_dbscan.py
@@ -761,14 +757,14 @@ C3 & 6 & $-0.9597$ & 0.0205 & \textbf{100.00\%} & 0.00\% \\
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{plot16_dbscan_clusters_pca.pdf}
+\includegraphics[width=0.98\columnwidth]{plot16_dbscan_clusters_pca.pdf}
 \caption{Two-dimensional PCA projection of DBSCAN density clusters, displaying core clusters (C0--C3) and isolated noise points (red crosses).}
 \label{fig:p16}
 \end{figure}
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\columnwidth]{plot17_dbscan_cluster_profiles.pdf}
+\includegraphics[width=0.98\columnwidth]{plot17_dbscan_cluster_profiles.pdf}
 \caption{Favorite win rate and upset frequency across DBSCAN clusters, with diagnostic breakdown of the isolated noise partition.}
 \label{fig:p17}
 \end{figure}
@@ -787,36 +783,35 @@ Table~\ref{tab:dbscan_profiles} and Figs.~\ref{fig:p16}--\ref{fig:p17} reveal ke
 \end{itemize}
 
 \subsection{Conclusion on Clustering}
-DBSCAN separated regular tour matches from deterministic elite matchups, and isolated 300 anomalous events including severe upsets, without requiring subjective threshold tuning.
+DBSCAN successfully separated regular tour matches from deterministic elite matchups, and isolated 300 anomalous events including severe upsets, without requiring arbitrary threshold tuning.
 
 % ---------------------------------------------------------------------
 \section{Step 3D: Big Data Architecture \& Scalability Analysis}
 
 \subsection{Scikit-learn vs.\ PySpark ML}
-The analytical pipeline was evaluated under two distinct execution architectures:
+I evaluated the analytical pipeline under two distinct execution architectures:
 \begin{enumerate}
     \item \textbf{Single-Threaded CPU Engine (Scikit-learn):} Vectorized NumPy arrays in flat host memory.
     \item \textbf{Distributed Engine (Apache PySpark 3.5):} DataFrame pipelines utilizing \texttt{pyspark.ml.fpm.FPGrowth} for distributed association mining, \texttt{VectorAssembler} for feature assembly, and \texttt{pyspark.ml.classification.DecisionTreeClassifier} for distributed tree induction across 8 local cores.
 \end{enumerate}
 
 \subsection{Commented Implementation Code (PySpark Pipeline)}
-The PySpark distributed benchmark script is implemented in \texttt{step3\_pyspark\_benchmark.py}:
+I implemented the distributed PySpark benchmark pipeline in \texttt{step3\_pyspark\_benchmark.py}:
 
-\begin{lstlisting}[style=pythonstyle, caption={Step 3D: Distributed Apache PySpark ML Pipeline}]
-# Distributed Big Data Pipeline via PySpark ML
+\begin{lstlisting}[style=pythonstyle, caption={Step 3D: Distributed Apache PySpark ML Pipeline Script}]
 from pyspark.sql import SparkSession
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.classification import DecisionTreeClassifier
 from pyspark.ml.fpm import FPGrowth
 
-# 1. Initialize distributed SparkSession
+# Initialize local PySpark session
 spark = SparkSession.builder \
     .appName("ATP_BigData_Scalability") \
     .master("local[*]") \
     .config("spark.driver.memory", "4g") \
     .getOrCreate()
 
-# 2. Distributed Decision Tree Pipeline
+# Distributed Decision Tree Pipeline
 feature_cols = ['Odds_Ratio', 'Implied_Prob_Diff', 'Log_Rank1', 'Log_Rank2']
 assembler = VectorAssembler(inputCols=feature_cols, outputCol="features")
 spark_df = assembler.transform(raw_df)
@@ -824,13 +819,13 @@ spark_df = assembler.transform(raw_df)
 dt = DecisionTreeClassifier(labelCol="Favorite_Won", featuresCol="features", maxDepth=6)
 dt_model = dt.fit(spark_df)
 
-# 3. Distributed Frequent Itemset Mining via FPGrowth
+# Distributed Frequent Itemset Mining via FPGrowth
 fp = FPGrowth(itemsCol="items", minSupport=0.05, minConfidence=0.60)
 fp_model = fp.fit(trans_df)
 \end{lstlisting}
 
 \subsection{Benchmark Across Dataset Sizes}
-The dataset was bootstrap-replicated to $1\times$ (14,695 matches), $5\times$ (73,475), and $10\times$ (146,950). Wall-clock execution times were measured directly on the host system (Table~\ref{tab:pyspark_bench}, Fig.~\ref{fig:p18_19}). Projections for $100\times$ and $1000\times$ scales illustrate theoretical scaling behavior.
+I bootstrap-replicated the dataset to $1\times$ (14,695 matches), $5\times$ (73,475), and $10\times$ (146,950). I measured wall-clock execution times directly on the host machine (Table~\ref{tab:pyspark_bench}, Fig.~\ref{fig:p18_19}). Projections for $100\times$ and $1000\times$ scales illustrate theoretical scaling behavior.
 
 \begin{lstlisting}[style=terminalstyle, caption={Step 3D: Scalability Benchmark Terminal Execution Log}]
 >>> EXECUTION RUN: step3_pyspark_benchmark.py
@@ -867,7 +862,7 @@ $1000\times^{\dagger}$ & $1.47\times10^{7}$ & 142.300 & \textbf{32.450} & $\math
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=0.92\textwidth]{plot18_19_pyspark_benchmark.pdf}
+\includegraphics[width=0.88\textwidth]{plot18_19_pyspark_benchmark.pdf}
 \caption{Total wall-clock execution time (left) and Amdahl's Law speedup curves (right) comparing single-thread Scikit-learn CPU execution with distributed PySpark.}
 \label{fig:p18_19}
 \end{figure*}
@@ -890,18 +885,18 @@ As $N$ scales from $10^4$ toward $10^7$, constant overhead becomes negligible re
 
 % ---------------------------------------------------------------------
 \section{Conclusion}
-This study presented an end-to-end descriptive and predictive analytics framework applied to professional ATP tennis dynamics:
+In this laboratory investigation, I implemented an end-to-end descriptive and predictive analytics framework for professional ATP tennis matches:
 \begin{itemize}
-    \item Preprocessing transformed 14,735 raw records into 14,697 analysis-ready matches with an empirical favorite win rate of 67.24\%.
-    \item Ten unique visualizations established parity convergence across rounds, stable bookmaker margins ($\mu = 5.94\%$), and surface-dependent favorite predictability.
-    \item CHARM reduced the 1,208 Apriori frequent itemsets to 1,096 closed itemsets without information loss (9.27\% reduction).
-    \item The CART classifier achieved 61.92\% accuracy, 79.60\% precision on favorites, and 0.6829 ROC-AUC, isolating the odds ratio as the dominant predictive feature (64.11\% importance).
-    \item DBSCAN identified four coherent operational clusters and isolated 300 anomalous matches and major historical upsets.
-    \item Scalability profiling confirmed the Amdahl's Law crossover where distributed Spark architectures surpass single-threaded CPU execution under Big Data scaling.
+    \item I cleaned and transformed 14,735 raw records into 14,697 analysis-ready matches, isolating an empirical favorite baseline win rate of 67.24\%.
+    \item My ten exploratory visualizations showed parity convergence across tournament rounds, stable bookmaker margins ($\mu = 5.94\%$), and surface-dependent favorite predictability.
+    \item My CHARM implementation reduced 1,208 Apriori frequent itemsets to 1,096 closed itemsets without information loss (a 9.27\% rule compaction).
+    \item My CART classifier reached 61.92\% accuracy, 79.60\% precision on favorites, and 0.6829 ROC-AUC, identifying odds ratio as the dominant predictive feature (64.11\% importance).
+    \item My DBSCAN clustering identified four coherent operational clusters and isolated 300 anomalous matches and major historical upsets.
+    \item My scalability benchmarking verified the Amdahl's Law crossover where distributed Spark architectures surpass single-threaded CPU execution under Big Data scaling.
 \end{itemize}
 
 \section*{Acknowledgment}
-The author thanks the faculty and instructional team of the Department of Computer Science and Engineering, IIITDM Kancheepuram, for the curriculum and infrastructure of the \textit{Analytics \& Systems of Big Data} laboratory course.
+I thank the faculty and instructional team of the Department of Computer Science and Engineering, IIITDM Kancheepuram, for the curriculum and infrastructure of the \textit{Analytics \& Systems of Big Data} laboratory course.
 
 % ---------------------------------------------------------------------
 \begin{thebibliography}{10}
