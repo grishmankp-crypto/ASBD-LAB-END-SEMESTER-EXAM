@@ -220,9 +220,6 @@ pip install numpy pandas scipy scikit-learn matplotlib pymupdf
 
 ---
 
-## 5. Overleaf Compilation Instructions
-A complete archive containing `report.tex` and all 17 vector `.pdf` figures is bundled in `overleaf_project.zip`.
-
 1. Go to [Overleaf.com](https://www.overleaf.com).
 2. Click **New Project** -> **Upload Project**.
 3. Select `overleaf_project.zip`.
