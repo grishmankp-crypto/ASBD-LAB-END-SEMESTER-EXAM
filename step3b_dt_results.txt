@@ -1,0 +1,166 @@
+========================================================================
+STEP 3B — DECISION TREE CLASSIFICATION RESULTS
+ATP Tennis Dataset  |  N = 14,695  |  2012–2017
+========================================================================
+
+TARGET: Favorite_Won (1 = higher-ranked player won, 0 = upset)
+REASON: Derived from ranking ground truth; not arbitrary; naturally
+        imbalanced 67/33 mirroring real-world match predictability.
+
+HYPERPARAMETERS:
+  criterion        : gini (Gini Impurity)
+  max_depth        : 6 (selected by 5-fold CV AUC maximization)
+  min_samples_split: 50
+  min_samples_leaf : 25
+  class_weight     : balanced (upweights minority Upset class)
+
+PERFORMANCE METRICS:
+  Accuracy  : 0.6192
+  Precision : 0.7960
+  Recall    : 0.5830
+  F1-Score  : 0.6731
+  ROC-AUC   : 0.6829
+
+CONFUSION MATRIX:
+  TN=835  FP=369
+  FN=1030  TP=1440
+
+CLASSIFICATION REPORT:
+                  precision    recall  f1-score   support
+
+       Upset (0)       0.45      0.69      0.54      1204
+Favorite_Won (1)       0.80      0.58      0.67      2470
+
+        accuracy                           0.62      3674
+       macro avg       0.62      0.64      0.61      3674
+    weighted avg       0.68      0.62      0.63      3674
+
+
+IF-THEN DECISION RULES (CART tree text):
+|--- Odds_Ratio <= 0.32
+|   |--- Player2_Implied_Prob <= 0.16
+|   |   |--- Log_Rank1 <= 3.82
+|   |   |   |--- Bookmaker_Margin <= 0.05
+|   |   |   |   |--- Player2_Implied_Prob <= 0.05
+|   |   |   |   |   |--- weights: [4.58, 23.05] class: 1
+|   |   |   |   |--- Player2_Implied_Prob >  0.05
+|   |   |   |   |   |--- Log_Rank2 <= 4.31
+|   |   |   |   |   |   |--- weights: [7.63, 96.68] class: 1
+|   |   |   |   |   |--- Log_Rank2 >  4.31
+|   |   |   |   |   |   |--- weights: [1.53, 109.32] class: 1
+|   |   |   |--- Bookmaker_Margin >  0.05
+|   |   |   |   |--- Implied_Prob_Diff <= 0.74
+|   |   |   |   |   |--- weights: [0.00, 29.00] class: 1
+|   |   |   |   |--- Implied_Prob_Diff >  0.74
+|   |   |   |   |   |--- Implied_Prob_Diff <= 0.76
+|   |   |   |   |   |   |--- weights: [12.21, 24.54] class: 1
+|   |   |   |   |   |--- Implied_Prob_Diff >  0.76
+|   |   |   |   |   |   |--- weights: [38.15, 233.51] class: 1
+|   |   |--- Log_Rank1 >  3.82
+|   |   |   |--- Abs_Rank_Diff <= 317.50
+|   |   |   |   |--- weights: [10.68, 13.39] class: 1
+|   |   |   |--- Abs_Rank_Diff >  317.50
+|   |   |   |   |--- weights: [3.05, 17.10] class: 1
+|   |--- Player2_Implied_Prob >  0.16
+|   |   |--- Log_Rank1 <= 4.62
+|   |   |   |--- Log_Rank2 <= 4.52
+|   |   |   |   |--- Log_Rank1 <= 3.80
+|   |   |   |   |   |--- Abs_Rank_Diff <= 53.50
+|   |   |   |   |   |   |--- weights: [112.93, 260.28] class: 1
+|   |   |   |   |   |--- Abs_Rank_Diff >  53.50
+|   |   |   |   |   |   |--- weights: [39.68, 43.88] class: 1
+|   |   |   |   |--- Log_Rank1 >  3.80
+|   |   |   |   |   |--- weights: [22.89, 17.85] class: 0
+|   |   |   |--- Log_Rank2 >  4.52
+|   |   |   |   |--- Round_1stRound <= 0.50
+|   |   |   |   |   |--- Odds_Ratio <= 0.26
+|   |   |   |   |   |   |--- weights: [38.15, 62.47] class: 1
+|   |   |   |   |   |--- Odds_Ratio >  0.26
+|   |   |   |   |   |   |--- weights: [12.21, 49.08] class: 1
+|   |   |   |   |--- Round_1stRound >  0.50
+|   |   |   |   |   |--- Log_Rank2 <= 5.31
+|   |   |   |   |   |   |--- weights: [12.21, 85.52] class: 1
+|   |   |   |   |   |--- Log_Rank2 >  5.31
+|   |   |   |   |   |   |--- weights: [18.31, 37.18] class: 1
+|   |   |--- Log_Rank1 >  4.62
+|   |   |   |--- weights: [24.42, 8.92] class: 0
+|--- Odds_Ratio >  0.32
+|   |--- Odds_Ratio <= 2.64
+|   |   |--- Implied_Prob_Diff <= 0.33
+|   |   |   |--- Implied_Prob_Diff <= -0.36
+|   |   |   |   |--- Log_Rank2 <= 4.23
+|   |   |   |   |   |--- Odds_Ratio <= 2.09
+|   |   |   |   |   |   |--- weights: [15.26, 37.18] class: 1
+|   |   |   |   |   |--- Odds_Ratio >  2.09
+|   |   |   |   |   |   |--- weights: [282.32, 301.18] class: 1
+|   |   |   |   |--- Log_Rank2 >  4.23
+|   |   |   |   |   |--- Log_Rank1 <= 4.34
+|   |   |   |   |   |   |--- weights: [39.68, 4.46] class: 0
+|   |   |   |   |   |--- Log_Rank1 >  4.34
+|   |   |   |   |   |   |--- weights: [74.78, 46.85] class: 0
+|   |   |   |--- Implied_Prob_Diff >  -0.36
+|   |   |   |   |--- Player1_Implied_Prob <= 0.43
+|   |   |   |   |   |--- Log_Rank2 <= 4.67
+|   |   |   |   |   |   |--- weights: [685.19, 483.38] class: 0
+|   |   |   |   |   |--- Log_Rank2 >  4.67
+|   |   |   |   |   |   |--- weights: [115.98, 44.62] class: 0
+|   |   |   |   |--- Player1_Implied_Prob >  0.43
+|   |   |   |   |   |--- Player2_Implied_Prob <= 0.44
+|   |   |   |   |   |   |--- weights: [695.87, 440.99] class: 0
+|   |   |   |   |   |--- Player2_Implied_Prob >  0.44
+|   |   |   |   |   |   |--- weights: [1957.90, 945.19] class: 0
+|   |   |--- Implied_Prob_Diff >  0.33
+|   |   |   |--- Log_Rank1 <= 4.32
+|   |   |   |   |--- Abs_Rank_Diff <= 12.50
+|   |   |   |   |   |--- Log_Rank1 <= 2.80
+|   |   |   |   |   |   |--- weights: [38.15, 52.80] class: 1
+|   |   |   |   |   |--- Log_Rank1 >  2.80
+|   |   |   |   |   |   |--- weights: [82.41, 42.39] class: 0
+|   |   |   |   |--- Abs_Rank_Diff >  12.50
+|   |   |   |   |   |--- Log_Rank1 <= 4.09
+|   |   |   |   |   |   |--- weights: [370.83, 527.25] class: 1
+|   |   |   |   |   |--- Log_Rank1 >  4.09
+|   |   |   |   |   |   |--- weights: [59.52, 53.54] class: 0
+|   |   |   |--- Log_Rank1 >  4.32
+|   |   |   |   |--- Log_Rank2 <= 4.73
+|   |   |   |   |   |--- Log_Rank1 <= 4.47
+|   |   |   |   |   |   |--- weights: [24.42, 11.15] class: 0
+|   |   |   |   |   |--- Log_Rank1 >  4.47
+|   |   |   |   |   |   |--- weights: [79.35, 13.39] class: 0
+|   |   |   |   |--- Log_Rank2 >  4.73
+|   |   |   |   |   |--- Implied_Prob_Diff <= 0.39
+|   |   |   |   |   |   |--- weights: [10.68, 23.05] class: 1
+|   |   |   |   |   |--- Implied_Prob_Diff >  0.39
+|   |   |   |   |   |   |--- weights: [47.31, 25.28] class: 0
+|   |--- Odds_Ratio >  2.64
+|   |   |--- Player1_Implied_Prob <= 0.20
+|   |   |   |--- Odds_Ratio <= 10.09
+|   |   |   |   |--- Round_1stRound <= 0.50
+|   |   |   |   |   |--- Log_Rank1 <= 4.83
+|   |   |   |   |   |   |--- weights: [80.88, 294.49] class: 1
+|   |   |   |   |   |--- Log_Rank1 >  4.83
+|   |   |   |   |   |   |--- weights: [6.10, 68.42] class: 1
+|   |   |   |   |--- Round_1stRound >  0.50
+|   |   |   |   |   |--- Abs_Rank_Diff <= 34.50
+|   |   |   |   |   |   |--- weights: [24.42, 21.57] class: 0
+|   |   |   |   |   |--- Abs_Rank_Diff >  34.50
+|   |   |   |   |   |   |--- weights: [68.67, 155.42] class: 1
+|   |   |   |--- Odds_Ratio >  10.09
+|   |   |   |   |--- Series_ATP500 <= 0.50
+|   |   |   |   |   |--- Implied_Prob_Diff <= -0.88
+|   |   |   |   |   |   |--- weights: [4.58, 144.27] class: 1
+|   |   |   |   |   |--- Implied_Prob_Diff >  -0.88
+|   |   |   |   |   |   |--- weights: [4.58, 29.00] class: 1
+|   |   |   |   |--- Series_ATP500 >  0.50
+|   |   |   |   |   |--- weights: [7.63, 28.26] class: 1
+|   |   |--- Player1_Implied_Prob >  0.20
+|   |   |   |--- Log_Rank2 <= 4.79
+|   |   |   |   |--- Log_Rank1 <= 2.14
+|   |   |   |   |   |--- weights: [1.53, 18.59] class: 1
+|   |   |   |   |--- Log_Rank1 >  2.14
+|   |   |   |   |   |--- Abs_Rank_Diff <= 19.50
+|   |   |   |   |   |   |--- weights: [86.98, 95.93] class: 1
+|   |   |   |   |   |--- Abs_Rank_Diff >  19.50
+|   |   |   |   |   |   |--- weights: [260.95, 480.40] class: 1
+|   |   |   |--- Log_Rank2 >  4.79
+|   |   |   |   |--- weights: [25.94, 9.67] class: 0

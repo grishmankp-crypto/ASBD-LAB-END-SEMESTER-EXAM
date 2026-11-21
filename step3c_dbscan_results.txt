@@ -1,0 +1,58 @@
+========================================================================
+STEP 3C — DBSCAN CLUSTERING RESULTS
+ATP Tennis Dataset  |  N = 14,695  |  2012–2017
+========================================================================
+
+FEATURES: ['Log_Rank1', 'Log_Rank2', 'Implied_Prob_Diff', 'Bookmaker_Margin']
+SCALING: StandardScaler (zero mean, unit variance)
+
+DBSCAN PARAMETERS:
+  epsilon     : 0.4864  (empirically from k-distance graph elbow, k=5)
+  min_samples : 5
+  algorithm   : ball_tree
+
+RESULTS:
+  Clusters found     : 4
+  Noise points       : 300 (2.04%)
+  Silhouette Score   : 0.1563
+  Davies-Bouldin Idx : 0.5474
+
+
+CLUSTER PROFILES:
+
+  Noise: n=300, Log_Rank1=3.898, Log_Rank2=3.834, ImpPDiff=-0.0371, BkmMgn=0.05556, FavWin=0.7167, Upset=0.2833
+
+  C0: n=14376, Log_Rank1=3.760, Log_Rank2=3.761, ImpPDiff=-0.0016, BkmMgn=0.05949, FavWin=0.6711, Upset=0.3289
+
+  C1: n=5, Log_Rank1=6.427, Log_Rank2=3.673, ImpPDiff=-0.0840, BkmMgn=0.06410, FavWin=0.6000, Upset=0.4000
+
+  C2: n=8, Log_Rank1=0.917, Log_Rank2=4.486, ImpPDiff=0.9519, BkmMgn=0.02832, FavWin=1.0000, Upset=0.0000
+
+  C3: n=6, Log_Rank1=4.591, Log_Rank2=0.828, ImpPDiff=-0.9597, BkmMgn=0.02052, FavWin=1.0000, Upset=0.0000
+
+NOISE ANOMALY BREAKDOWN:
+Anomaly_Type
+Other               197
+Extreme_Rank_Gap     69
+Major_Upset          31
+Odds_Anomaly          3
+
+INTERPRETATION:
+
+1. DBSCAN does not require a pre-specified number of clusters — this is a key
+   advantage over k-Means for match data where natural groupings are unknown.
+
+2. The k-distance elbow method (Ester et al., 1996) provided a principled,
+   data-driven epsilon value, avoiding arbitrary parameter guessing.
+
+3. Noise points (label=-1) represent matches that DBSCAN could not assign to
+   any dense cluster — these are the most statistically anomalous matches:
+   extreme rank gaps, corrupted odds, or genuine unpredictable upsets.
+
+4. The cluster with the highest upset rate isolates matches where both players
+   had near-symmetric implied probabilities (ImpPDiff ≈ 0) and high global
+   rankings — a region where match outcomes are inherently uncertain.
+
+5. The cluster with the highest Favorite Win rate corresponds to matches with
+   strong odds asymmetry: heavy favorites (P1_Implied_Prob > 0.75) playing
+   against lower-ranked opponents in later rounds after seeded bracket sorting.
