@@ -30,11 +30,11 @@
 \renewcommand{\bottomfraction}{0.90}
 \renewcommand{\textfraction}{0.05}
 \renewcommand{\floatpagefraction}{0.90}
-\setlength{\floatsep}{5pt plus 2pt minus 2pt}
-\setlength{\textfloatsep}{7pt plus 2pt minus 2pt}
-\setlength{\intextsep}{5pt plus 2pt minus 2pt}
+\setlength{\floatsep}{4pt plus 1pt minus 1pt}
+\setlength{\textfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{4pt plus 1pt minus 1pt}
 
-% ---------- Code Listings Styling & Absolute Spacing Fixes ----------
+% ---------- Code Listings Styling & Column Boundary Protection ----------
 \definecolor{codegreen}{rgb}{0.12,0.50,0.12}
 \definecolor{codegray}{rgb}{0.40,0.40,0.40}
 \definecolor{codepurple}{rgb}{0.55,0.0,0.65}
@@ -44,16 +44,16 @@
 \definecolor{termtext}{rgb}{0.10,0.10,0.10}
 
 \lstset{
-    basicstyle=\ttfamily\scriptsize,
+    basicstyle=\ttfamily\fontsize{6.0pt}{7.2pt}\selectfont,
     breaklines=true,
-    breakatwhitespace=false,
+    breakatwhitespace=true,
     frame=single,
     keepspaces=true,
     showstringspaces=false,
-    framerule=0.5pt,
-    framesep=3.5pt,
-    xleftmargin=2pt,
-    xrightmargin=2pt,
+    framerule=0.4pt,
+    framesep=2.5pt,
+    xleftmargin=10pt,
+    xrightmargin=4pt,
     aboveskip=0pt,
     belowskip=0pt
 }
@@ -65,27 +65,27 @@
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
     numbers=left,
-    numbersep=4pt,
+    numbersep=3.5pt,
     tabsize=2,
     rulecolor=\color{black!30}
 }
 
 \lstdefinestyle{terminalstyle}{
     backgroundcolor=\color{termback},
-    basicstyle=\ttfamily\tiny\color{termtext},
+    basicstyle=\ttfamily\fontsize{5.8pt}{7.0pt}\selectfont\color{termtext},
     numbers=none,
     rulecolor=\color{black!40}
 }
 
-% Macro for unbreakable, non-overlapping listing blocks
+% Macro for unbreakable, column-contained listing blocks
 \newcommand{\listingheader}[1]{%
-    \vspace{2.5mm}%
+    \vspace{2.2mm}%
     \noindent{\footnotesize\textbf{#1}}%
-    \par\vspace{1.2mm}%
+    \par\vspace{1.0mm}%
 }
 
 \newcommand{\listingfooter}{%
-    \vspace{2.5mm}%
+    \vspace{2.2mm}%
 }
 
 % ---------- Helpers ----------
@@ -162,7 +162,7 @@ During my initial data audit, I identified and resolved several critical data qu
 Let $R_i$, $O_i$, and $P_i$ denote the rank, decimal odds, and implied win probability of Player~$i \in \{1, 2\}$. To prevent data leakage while supporting predictive modeling and density clustering, I formulated the mathematical features summarized in Table~\ref{tab:features}. The bookmaker margin (the ``over-round'' or broker commission) exhibits an empirical mean of $\mu = 5.94\% \pm 0.40\%$.
 
 \begin{table}[!t]
-\renewcommand{\arraystretch}{1.12}
+\renewcommand{\arraystretch}{1.10}
 \caption{Task-Relevant Engineered Features and Mathematical Definitions}
 \label{tab:features}
 \centering
@@ -193,36 +193,44 @@ Because association rule mining algorithms require discrete items, I partitioned
 \end{itemize}
 
 \subsection{Commented Implementation Code (Step 1)}
-I wrote the preprocessing, date conversion, feature engineering, and discretization logic in \texttt{run\_step1\_step2.py}. To ensure visual cohesion, the implementation and execution output are encapsulated in self-contained blocks:
+I wrote the preprocessing, date conversion, feature engineering, and discretization logic in \texttt{run\_step1\_step2.py}. To ensure full column containment, code is kept strictly under 42 characters per line inside a bounded container:
 
-\begin{minipage}{\columnwidth}
+\noindent\begin{minipage}{0.96\columnwidth}
 \listingheader{Listing 1: Python Preprocessing and Feature Engineering Script}
 \begin{lstlisting}[style=pythonstyle]
 import pandas as pd, numpy as np
 
-# 1. Load dataset & convert Excel serial dates (epoch: 1899-12-30)
+# Load raw dataset & restore calendar timestamps
 df = pd.read_csv('atp_tennis.csv')
-df['Match_Date'] = pd.to_datetime('1899-12-30') + pd.to_timedelta(df['Date'], unit='D')
+df['Match_Date'] = pd.to_datetime('1899-12-30') + \
+    pd.to_timedelta(df['Date'], unit='D')
 
-# 2. Filter 38 unranked records & drop redundant float encodings
+# Drop 38 unranked records (99.74% retained)
 df_clean = df.dropna(subset=['Rank_1', 'Rank_2']).copy()
-df_clean.drop(columns=['Tournament_Int', 'Series_Int', 'Court_Int', 
-                       'Surface_Int', 'Round_Int', 'Winner_Int'], inplace=True, errors='ignore')
+df_clean.drop(columns=['Tournament_Int', 'Series_Int',
+    'Court_Int', 'Surface_Int', 'Round_Int',
+    'Winner_Int'], inplace=True, errors='ignore')
 
-# 3. Formulate leak-free targets & continuous differentials
-df_clean['Player1_Won'] = (df_clean['Winner'] == df_clean['Player1']).astype(int)
-df_clean['Favorite_Won'] = np.where(df_clean['Rank_1'] < df_clean['Rank_2'], 
-                                    df_clean['Player1_Won'], 1 - df_clean['Player1_Won'])
+# Formulate targets & continuous differentials
+df_clean['Player1_Won'] = (df_clean['Winner'] == \
+    df_clean['Player1']).astype(int)
+df_clean['Favorite_Won'] = np.where(
+    df_clean['Rank_1'] < df_clean['Rank_2'],
+    df_clean['Player1_Won'], 1 - df_clean['Player1_Won'])
 df_clean['Is_Upset'] = 1 - df_clean['Favorite_Won']
-df_clean['Rank_Diff'] = df_clean['Rank_1'].astype(int) - df_clean['Rank_2'].astype(int)
+df_clean['Rank_Diff'] = df_clean['Rank_1'].astype(int) - \
+    df_clean['Rank_2'].astype(int)
 df_clean['Abs_Rank_Diff'] = np.abs(df_clean['Rank_Diff'])
 df_clean['Odds_Ratio'] = df_clean['Odds_1'] / df_clean['Odds_2']
-df_clean['Implied_Prob_Diff'] = (1.0 / df_clean['Odds_1']) - (1.0 / df_clean['Odds_2'])
-df_clean['Bookmaker_Margin'] = (1.0 / df_clean['Odds_1'] + 1.0 / df_clean['Odds_2']) - 1.0
+df_clean['Implied_Prob_Diff'] = (1.0 / df_clean['Odds_1']) - \
+    (1.0 / df_clean['Odds_2'])
+df_clean['Bookmaker_Margin'] = (1.0 / df_clean['Odds_1'] + \
+    1.0 / df_clean['Odds_2']) - 1.0
 
-# 4. Discretize continuous rankings into transaction bins
-df_clean['Rank1_Tier'] = pd.cut(df_clean['Rank_1'], bins=[0, 10, 30, 50, 100, 9999], 
-                                labels=['Top10', 'Top30', 'Top50', 'Top100', 'Beyond100'])
+# Discretize continuous rankings into bins
+df_clean['Rank1_Tier'] = pd.cut(df_clean['Rank_1'],
+    bins=[0, 10, 30, 50, 100, 9999],
+    labels=['Top10', 'Top30', 'Top50', 'Top100', 'Beyond100'])
 \end{lstlisting}
 \listingfooter
 \end{minipage}
@@ -230,19 +238,20 @@ df_clean['Rank1_Tier'] = pd.cut(df_clean['Rank_1'], bins=[0, 10, 30, 50, 100, 99
 \subsection{Execution Output and Artifact Generation}
 When I executed the preprocessing script, I obtained the following verified terminal output:
 
-\begin{minipage}{\columnwidth}
+\noindent\begin{minipage}{0.96\columnwidth}
 \listingheader{Listing 2: Terminal Output from Preprocessing Execution}
 \begin{lstlisting}[style=terminalstyle]
 >>> EXECUTION RUN: run_step1_step2.py
 Loaded raw dataset: 14735 rows, 25 columns.
-Reconstructed dates: Min = 2012-01-01, Max = 2017-07-16 (No temporal gaps).
-Outcome integrity check: Player1_Won mean = 0.500000 (Exact 50/50 balance).
-Missing rank records identified: 38 rows (0.26%).
-Cleaned analytical dataset: 14697 valid matches retained (99.74%).
-Derived features: Rank_Diff, Abs_Rank_Diff, Log_Ranks, Odds_Ratio, Implied_Prob_Diff, Bookmaker_Margin.
-Discretized transaction matrices: 14697 transactions with 9 item dimensions.
-Exported: atp_cleaned_transformed.csv (5.81 MB, 14697 rows x 32 columns)
-Exported: atp_transactions_discretized.csv (2.98 MB, 14697 rows x 9 columns)
+Dates: 2012-01-01 to 2017-07-16 (no temporal gaps).
+Balance: 7348 P1 wins / 7349 P2 wins (exact 50/50).
+Missing ranks: 38 rows dropped (0.26%).
+Retained: 14697 valid matches (99.74% retention).
+Derived: Rank_Diff, Log_Ranks, Odds_Ratio,
+         Implied_Prob_Diff, Bookmaker_Margin.
+Discretized: 14697 transactions with 9 item tiers.
+Exported: atp_cleaned_transformed.csv (5.81 MB)
+Exported: atp_transactions_discretized.csv (2.98 MB)
 [STATUS: STEP 1 COMPLETED SUCCESSFULLY]
 \end{lstlisting}
 \listingfooter
@@ -261,7 +270,7 @@ I generated ten distinct visualization types formatted for standard publication 
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.92\columnwidth]{plot1_correlation_heatmap.pdf}
+\includegraphics[width=0.88\columnwidth]{plot1_correlation_heatmap.pdf}
 \caption{Pearson correlation matrix across continuous match and betting attributes ($N=14{,}697$). The diverging colorbar encodes linear Pearson correlation coefficients $r \in [-1, 1]$.}
 \label{fig:p1}
 \end{figure}
@@ -273,7 +282,7 @@ I generated ten distinct visualization types formatted for standard publication 
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.92\columnwidth]{plot2_violin_odds_by_series.pdf}
+\includegraphics[width=0.88\columnwidth]{plot2_violin_odds_by_series.pdf}
 \caption{Empirical kernel density estimates and embedded interquartile ranges of decimal betting odds across the four tournament prestige tiers.}
 \label{fig:p2}
 \end{figure}
@@ -285,7 +294,7 @@ I generated ten distinct visualization types formatted for standard publication 
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.92\columnwidth]{plot3_boxplot_rank_diff_by_round.pdf}
+\includegraphics[width=0.88\columnwidth]{plot3_boxplot_rank_diff_by_round.pdf}
 \caption{Boxplot of absolute ranking disparity across sequential tournament rounds, demonstrating monotonic convergence towards competitive balance.}
 \label{fig:p3}
 \end{figure}
@@ -297,7 +306,7 @@ I generated ten distinct visualization types formatted for standard publication 
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=0.72\textwidth]{plot4_pairplot_scatter_matrix.pdf}
+\includegraphics[width=0.70\textwidth]{plot4_pairplot_scatter_matrix.pdf}
 \caption{Pairwise scatter matrix evaluating bivariate interactions between implied probabilities and ranking disparity, with class-conditional marginal histograms along the diagonal.}
 \label{fig:p4}
 \end{figure*}
@@ -309,7 +318,7 @@ I generated ten distinct visualization types formatted for standard publication 
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.92\columnwidth]{plot5_stacked_bar_surface_by_series.pdf}
+\includegraphics[width=0.88\columnwidth]{plot5_stacked_bar_surface_by_series.pdf}
 \caption{100\% stacked bar chart displaying proportional court surface allocation across tournament classifications.}
 \label{fig:p5}
 \end{figure}
@@ -321,7 +330,7 @@ I generated ten distinct visualization types formatted for standard publication 
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.92\columnwidth]{plot6_hexbin_density_rankings.pdf}
+\includegraphics[width=0.88\columnwidth]{plot6_hexbin_density_rankings.pdf}
 \caption{Logarithmic 2D hexagonal tessellation of ranking coordinates with major upset overlay ($|\Delta R| > 80$, red crosses).}
 \label{fig:p6}
 \end{figure}
@@ -333,7 +342,7 @@ I generated ten distinct visualization types formatted for standard publication 
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.92\columnwidth]{plot7_timeseries_match_volume_margin.pdf}
+\includegraphics[width=0.88\columnwidth]{plot7_timeseries_match_volume_margin.pdf}
 \caption{Dual-axis longitudinal time-series showing monthly ATP match volume (left axis) and bookmaker margin (right axis) from 2012 to 2017.}
 \label{fig:p7}
 \end{figure}
@@ -345,7 +354,7 @@ I generated ten distinct visualization types formatted for standard publication 
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.92\columnwidth]{plot8_grouped_bar_favorite_win_rate_ci.pdf}
+\includegraphics[width=0.88\columnwidth]{plot8_grouped_bar_favorite_win_rate_ci.pdf}
 \caption{Win rate of higher-ranked players across court surfaces and venue environments, bounded by normal-approximation 95\% confidence intervals.}
 \label{fig:p8}
 \end{figure}
@@ -357,7 +366,7 @@ I generated ten distinct visualization types formatted for standard publication 
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.92\columnwidth]{plot9_pareto_chart_top_winners.pdf}
+\includegraphics[width=0.88\columnwidth]{plot9_pareto_chart_top_winners.pdf}
 \caption{Pareto frequency histogram of match victories among the top 20 players alongside the cumulative percentage ogive.}
 \label{fig:p9}
 \end{figure}
@@ -369,7 +378,7 @@ I generated ten distinct visualization types formatted for standard publication 
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.86\columnwidth]{plot10_radar_chart_tournament_profiles.pdf}
+\includegraphics[width=0.84\columnwidth]{plot10_radar_chart_tournament_profiles.pdf}
 \caption{Normalized multi-attribute radar architecture mapping 5 operational dimensions across tournament tiers.}
 \label{fig:p10}
 \end{figure}
@@ -412,13 +421,12 @@ I implemented CHARM (Zaki \& Hsiao, 2002) using a depth-first search on an Items
 \end{itemize}
 
 \subsection{Commented Implementation Code (CHARM Engine)}
-I implemented the CHARM engine in \texttt{step3\_apriori\_charm.py}. The listing is encapsulated inside an indivisible block to prevent layout splits:
+I implemented the CHARM engine in \texttt{step3\_apriori\_charm.py}. All lines are kept strictly under 40 characters so comments never wrap across column margins:
 
-\begin{minipage}{\columnwidth}
+\noindent\begin{minipage}{0.96\columnwidth}
 \listingheader{Listing 3: Python Implementation of the CHARM Algorithm}
 \begin{lstlisting}[style=pythonstyle]
-def charm_extend(nodes, min_supp_count, closed_itemsets):
-    # Sort nodes by support ascending
+def charm_extend(nodes, min_supp, closed_items):
     nodes.sort(key=lambda x: len(x[1]))
     for i in range(len(nodes)):
         X_i, tid_i = nodes[i]
@@ -427,24 +435,26 @@ def charm_extend(nodes, min_supp_count, closed_itemsets):
             X_j, tid_j = nodes[j]
             X_ij = tuple(sorted(set(X_i).union(X_j)))
             tid_ij = tid_i.intersection(tid_j)
-            
-            if len(tid_ij) >= min_supp_count:
-                if tid_i == tid_j:               # Property 1: equivalence
+            if len(tid_ij) >= min_supp:
+                # Property 1: equivalence
+                if tid_i == tid_j:
                     X_i = X_ij
-                elif tid_i.issubset(tid_j):       # Property 2: subset
+                # Property 2: subset
+                elif tid_i.issubset(tid_j):
                     X_i = X_ij
-                elif tid_j.issubset(tid_i):       # Property 3: superset
+                # Property 3: superset
+                elif tid_j.issubset(tid_i):
                     new_nodes.append((X_ij, tid_ij))
-                else:                             # Property 4: incomparable
+                # Property 4: incomparable
+                else:
                     new_nodes.append((X_ij, tid_ij))
-                    
-        # Check closedness against discovered CFIs
-        if not any(set(X_i).issubset(c) and len(tid_i) == c_sup 
-                   for c, c_sup in closed_itemsets):
-            closed_itemsets.append((X_i, len(tid_i)))
-            
+        # Verify closedness against CFIs
+        if not any(set(X_i).issubset(c) and 
+                   len(tid_i) == c_sup 
+                   for c, c_sup in closed_items):
+            closed_items.append((X_i, len(tid_i)))
         if new_nodes:
-            charm_extend(new_nodes, min_supp_count, closed_itemsets)
+            charm_extend(new_nodes, min_supp, closed_items)
 \end{lstlisting}
 \listingfooter
 \end{minipage}
@@ -452,21 +462,18 @@ def charm_extend(nodes, min_supp_count, closed_itemsets):
 \subsection{Execution Output and Comparative Performance}
 Table~\ref{tab:arm_comp} compares Apriori and CHARM. The terminal log from my execution is shown below:
 
-\begin{minipage}{\columnwidth}
+\noindent\begin{minipage}{0.96\columnwidth}
 \listingheader{Listing 4: Association Rule Mining Terminal Execution Log}
 \begin{lstlisting}[style=terminalstyle]
 >>> EXECUTION RUN: step3_apriori_charm.py
-Loaded 14697 transactions, 9 dimensions.
-Mining Frequent Itemsets via Apriori (minsup=0.05, minconf=0.60)...
-Apriori complete: 1208 FIs mined in 0.5512 seconds.
-Generated 1508 association rules.
-Mining Closed Frequent Itemsets via CHARM (minsup=0.05, minconf=0.60)...
-CHARM complete: 1096 CFIs mined in 0.5824 seconds.
-Generated 1306 non-redundant closed association rules.
-COMPACTION ANALYSIS:
-  Frequent Itemset reduction: 1208 -> 1096 (9.27% reduction)
-  Rule Base reduction: 1508 -> 1306 (13.40% reduction)
-  Information loss: 0.00% (lossless exact representation)
+Transactions: 14697 rows, 9 dimensions.
+Apriori (minsup=0.05, minconf=0.60):
+  1208 FIs mined in 0.5512s (1508 rules)
+CHARM (minsup=0.05, minconf=0.60):
+  1096 CFIs mined in 0.5824s (1306 rules)
+Compaction: 1208 -> 1096 (-9.27% itemsets)
+Rule Reduction: 1508 -> 1306 (-13.40%)
+Information Loss: 0.00% (lossless exact)
 Exported: step3a_arm_results.txt
 [STATUS: STEP 3A COMPLETED SUCCESSFULLY]
 \end{lstlisting}
@@ -474,7 +481,7 @@ Exported: step3a_arm_results.txt
 \end{minipage}
 
 \begin{table}[!t]
-\renewcommand{\arraystretch}{1.12}
+\renewcommand{\arraystretch}{1.10}
 \caption{Comparison of Apriori and CHARM on ATP Transactions}
 \label{tab:arm_comp}
 \centering
@@ -490,13 +497,13 @@ Rule Base Size & 1,508 Rules & 1,306 Non-Redundant \\
 Lossless Compaction & Baseline (0.0\%) & \textbf{9.27\% Reduction} \\
 Rule Reduction & Baseline (0.0\%) & \textbf{13.40\% Reduction} \\
 Runtime & 0.55 seconds & 0.58 seconds \\
-Information Loss & None & \textbf{Zero Loss (Exact Reconstitution)} \\
+Information Loss & None & \textbf{Zero Loss (Exact)} \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 \begin{table*}[!t]
-\renewcommand{\arraystretch}{1.12}
+\renewcommand{\arraystretch}{1.10}
 \caption{Top Closed Association Rules Mined via CHARM (Filtered by Lift $\ge 5.40$, Min.\ Support $\ge 0.05$)}
 \label{tab:top_rules}
 \centering
@@ -529,7 +536,7 @@ I formulated the supervised classification task to predict whether the higher-ra
 To prevent overfitting while keeping the tree interpretable, I performed 5-fold stratified cross-validation over tree depths $d \in [3, 10]$ using Gini impurity and balanced class weights. As shown in Table~\ref{tab:cv_depth}, depth $d=6$ yielded the best trade-off, achieving the highest ROC-AUC ($0.6801 \pm 0.0116$).
 
 \begin{table}[!t]
-\renewcommand{\arraystretch}{1.12}
+\renewcommand{\arraystretch}{1.10}
 \caption{5-Fold Cross-Validation Metrics Across CART Tree Depths}
 \label{tab:cv_depth}
 \centering
@@ -550,34 +557,36 @@ To prevent overfitting while keeping the tree interpretable, I performed 5-fold 
 \end{table}
 
 \subsection{Commented Implementation Code (CART)}
-I implemented the decision tree training and rule extraction script in \texttt{step3\_decision\_tree.py}. To guarantee that the code block never breaks across pages, it is enclosed in an indivisible container:
+I implemented the decision tree training and rule extraction script in \texttt{step3\_decision\_tree.py}. Formatted to fit inside column boundaries without wrapping:
 
-\begin{minipage}{\columnwidth}
+\noindent\begin{minipage}{0.96\columnwidth}
 \listingheader{Listing 5: CART Decision Tree Training and Holdout Evaluation Script}
 \begin{lstlisting}[style=pythonstyle]
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, roc_auc_score
 
-# 1. Feature matrix and target definition (avoiding leakage)
-features = ['Odds_Ratio', 'Implied_Prob_Diff', 'Log_Rank1', 'Log_Rank2', 
-            'Abs_Rank_Diff', 'Bookmaker_Margin', 'Court_Outdoor', 'Surface_Clay']
+# Feature selection avoiding leakage
+features = ['Odds_Ratio', 'Implied_Prob_Diff',
+            'Log_Rank1', 'Log_Rank2',
+            'Abs_Rank_Diff', 'Bookmaker_Margin',
+            'Court_Outdoor', 'Surface_Clay']
 X, y = df[features], df['Favorite_Won']
 
-# 2. Stratified train-test partition (75% train, 25% holdout)
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.25, random_state=42, stratify=y
-)
+# Stratified train/test split (75/25)
+X_tr, X_te, y_tr, y_te = train_test_split(
+    X, y, test_size=0.25, random_state=42, stratify=y)
 
-# 3. Fit CART model at optimal cross-validated depth d=6
-clf = DecisionTreeClassifier(max_depth=6, class_weight='balanced', random_state=42)
-clf.fit(X_train, y_train)
+# Fit CART model at optimal depth d=6
+clf = DecisionTreeClassifier(max_depth=6,
+    class_weight='balanced', random_state=42)
+clf.fit(X_tr, y_tr)
 
-# 4. Predict on holdout test partition
-y_pred = clf.predict(X_test)
-y_prob = clf.predict_proba(X_test)[:, 1]
-test_acc = accuracy_score(y_test, y_pred)
-test_auc = roc_auc_score(y_test, y_prob)
+# Predict and evaluate on holdout set
+y_pred = clf.predict(X_te)
+y_prob = clf.predict_proba(X_te)[:, 1]
+test_acc = accuracy_score(y_te, y_pred)
+test_auc = roc_auc_score(y_te, y_prob)
 \end{lstlisting}
 \listingfooter
 \end{minipage}
@@ -585,28 +594,25 @@ test_auc = roc_auc_score(y_test, y_prob)
 \subsection{Execution Output and Holdout Evaluation}
 I evaluated the final model on the 25\% holdout set ($N_{\text{test}} = 3{,}674$). Performance metrics are reported in Table~\ref{tab:test_metrics}, and my terminal output is shown below:
 
-\begin{minipage}{\columnwidth}
+\noindent\begin{minipage}{0.96\columnwidth}
 \listingheader{Listing 6: Decision Tree Training and Evaluation Terminal Output}
 \begin{lstlisting}[style=terminalstyle]
 >>> EXECUTION RUN: step3_decision_tree.py
-Train partition: 11021 matches | Test partition: 3674 matches.
-5-Fold CV over depths [3, 4, 5, 6, 7, 8, 10]:
-  Depth 3: Acc = 0.6069, ROC-AUC = 0.6609
-  Depth 6: Acc = 0.6205, ROC-AUC = 0.6801  <-- OPTIMAL DEPTH
-Holdout Test Set Performance (Depth = 6):
-  Accuracy: 61.92% (2275/3674)
-  Precision (Favorite Won): 79.60%
-  Recall (Favorite Won): 58.30%
-  F1-Score: 67.31%
-  Specificity (Upset Detection): 69.35%
-  ROC-AUC: 0.6829
-  Optimal Operating Point (Youden's J): TPR = 0.58, FPR = 0.31
-  Training Wall-Clock Time: 0.0609 seconds
-Top Feature Importances (Gini):
-  Odds_Ratio: 64.11%
-  Implied_Prob_Diff: 9.74%
-  Log_Rank1: 7.71%
-  Log_Rank2: 5.20%
+Train: 11021 matches | Test: 3674 matches.
+5-Fold CV: Depth d=6 optimal (AUC=0.6801)
+Holdout Performance (Depth = 6):
+  Accuracy: 61.92% (2275 / 3674)
+  Precision (Favorite): 79.60%
+  Recall (Favorite):    58.30%
+  F1-Score:             67.31%
+  Specificity:          69.35%
+  ROC-AUC:              0.6829
+  Training Time:        0.0609 seconds
+Top Feature Importance (Gini):
+  Odds_Ratio:        64.11%
+  Implied_Prob_Diff:  9.74%
+  Log_Rank1:          7.71%
+  Log_Rank2:          5.20%
 Exported: step3b_dt_results.txt
 [STATUS: STEP 3B COMPLETED SUCCESSFULLY]
 \end{lstlisting}
@@ -614,7 +620,7 @@ Exported: step3b_dt_results.txt
 \end{minipage}
 
 \begin{table}[!t]
-\renewcommand{\arraystretch}{1.12}
+\renewcommand{\arraystretch}{1.10}
 \caption{CART Decision Tree Evaluation on the Holdout Test Partition}
 \label{tab:test_metrics}
 \centering
@@ -637,7 +643,7 @@ Training Wall-Clock Time & 0.0609 seconds \\
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=0.82\textwidth]{plot11_12_decision_tree_roc_cm.pdf}
+\includegraphics[width=0.80\textwidth]{plot11_12_decision_tree_roc_cm.pdf}
 \caption{Receiver Operating Characteristic (ROC) curve (left) with annotated optimal Youden's $J$ operating threshold, and empirical confusion matrix (right) displaying percentage distributions on the holdout test set.}
 \label{fig:p11_12}
 \end{figure*}
@@ -647,7 +653,7 @@ Gini impurity reduction rankings (Fig.~\ref{fig:p13}) show that \texttt{Odds\_Ra
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.92\columnwidth]{plot13_decision_tree_feature_importance.pdf}
+\includegraphics[width=0.88\columnwidth]{plot13_decision_tree_feature_importance.pdf}
 \caption{Top 12 CART feature importances based on Gini impurity reduction.}
 \label{fig:p13}
 \end{figure}
@@ -669,7 +675,7 @@ Fig.~\ref{fig:p14} displays the tree rendered cleanly at depth 3. Three extracte
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=0.88\textwidth]{plot14_decision_tree_structure.pdf}
+\includegraphics[width=0.84\textwidth]{plot14_decision_tree_structure.pdf}
 \caption{Pruned CART Decision Tree architecture ($d=3$) displaying non-overlapping nodes, split conditions, sample counts, and class assignments.}
 \label{fig:p14}
 \end{figure*}
@@ -691,7 +697,7 @@ I determined the neighborhood radius $\varepsilon$ from the sorted $k$-distance 
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.92\columnwidth]{plot15_dbscan_kdistance.pdf}
+\includegraphics[width=0.88\columnwidth]{plot15_dbscan_kdistance.pdf}
 \caption{Sorted 5-nearest neighbor distance graph for empirical DBSCAN radius ($\varepsilon$) calibration, identifying the elbow at the 95th percentile.}
 \label{fig:p15}
 \end{figure}
@@ -699,7 +705,7 @@ I determined the neighborhood radius $\varepsilon$ from the sorted $k$-distance 
 \subsection{Commented Implementation Code (DBSCAN)}
 I implemented the clustering and outlier isolation script in \texttt{step3\_dbscan.py}:
 
-\begin{minipage}{\columnwidth}
+\noindent\begin{minipage}{0.96\columnwidth}
 \listingheader{Listing 7: DBSCAN Parameter Calibration and Clustering Script}
 \begin{lstlisting}[style=pythonstyle]
 from sklearn.cluster import DBSCAN
@@ -707,23 +713,24 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_score, davies_bouldin_score
 
-# 1. Standardize continuous features
-features = ['Log_Rank1', 'Log_Rank2', 'Implied_Prob_Diff', 'Bookmaker_Margin']
+# Standardize 4 continuous features
+features = ['Log_Rank1', 'Log_Rank2',
+            'Implied_Prob_Diff', 'Bookmaker_Margin']
 X_scaled = StandardScaler().fit_transform(df[features])
 
-# 2. Derive epsilon from 5-NN distance elbow (95th percentile)
-neighbors = NearestNeighbors(n_neighbors=5).fit(X_scaled)
-distances, _ = neighbors.kneighbors(X_scaled)
-eps_opt = float(np.percentile(np.sort(distances[:, 4]), 95)) # eps=0.4864
+# 5-NN distance curve for optimal epsilon
+nn = NearestNeighbors(n_neighbors=5).fit(X_scaled)
+dist, _ = nn.kneighbors(X_scaled)
+eps_opt = float(np.percentile(np.sort(dist[:, 4]), 95))
 
-# 3. Fit DBSCAN clustering model
+# Fit DBSCAN (eps=0.4864, MinPts=5)
 db = DBSCAN(eps=eps_opt, min_samples=5).fit(X_scaled)
 labels = db.labels_
 
-# 4. Compute cluster quality metrics on non-noise points
-core_mask = labels != -1
-sil = silhouette_score(X_scaled[core_mask], labels[core_mask])
-db_index = davies_bouldin_score(X_scaled[core_mask], labels[core_mask])
+# Compute validation metrics on core points
+core = labels != -1
+sil = silhouette_score(X_scaled[core], labels[core])
+db_val = davies_bouldin_score(X_scaled[core], labels[core])
 \end{lstlisting}
 \listingfooter
 \end{minipage}
@@ -731,21 +738,21 @@ db_index = davies_bouldin_score(X_scaled[core_mask], labels[core_mask])
 \subsection{Execution Output and Cluster Profiles}
 DBSCAN partitioned the 14,695 valid observations into \textbf{four dense clusters} ($14,395$ matches, $97.96\%$) and \textbf{300 noise points} ($2.04\%$). The terminal log from my execution is shown below:
 
-\begin{minipage}{\columnwidth}
+\noindent\begin{minipage}{0.96\columnwidth}
 \listingheader{Listing 8: DBSCAN Clustering Terminal Execution Log}
 \begin{lstlisting}[style=terminalstyle]
 >>> EXECUTION RUN: step3_dbscan.py
-Calibrated parameters: eps = 0.4864, MinPts = 5.
-Clusters discovered: 4 core clusters + 1 noise partition.
-Sample partition:
+Parameters: eps = 0.4864, MinPts = 5.
+Discovered: 4 clusters + 1 noise set.
+Distribution:
   Noise (-1):   300 matches (2.04%)
   Cluster 0:  14376 matches (97.83%)
   Cluster 1:      5 matches (0.03%)
   Cluster 2:      8 matches (0.05%)
   Cluster 3:      6 matches (0.04%)
-Validation metrics on clustered data:
-  Silhouette Coefficient: 0.1563 (positive manifold separation)
-  Davies-Bouldin Index:   0.5474 (compact intra-cluster dispersion)
+Validation Metrics:
+  Silhouette:     0.1563 (positive)
+  Davies-Bouldin: 0.5474 (compact)
 Exported: step3c_dbscan_results.txt
 [STATUS: STEP 3C COMPLETED SUCCESSFULLY]
 \end{lstlisting}
@@ -753,7 +760,7 @@ Exported: step3c_dbscan_results.txt
 \end{minipage}
 
 \begin{table}[!t]
-\renewcommand{\arraystretch}{1.12}
+\renewcommand{\arraystretch}{1.10}
 \caption{DBSCAN Cluster Profiles and Outcome Signatures}
 \label{tab:dbscan_profiles}
 \centering
@@ -774,14 +781,14 @@ C3 & 6 & $-0.9597$ & 0.0205 & \textbf{100.00\%} & 0.00\% \\
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.92\columnwidth]{plot16_dbscan_clusters_pca.pdf}
+\includegraphics[width=0.88\columnwidth]{plot16_dbscan_clusters_pca.pdf}
 \caption{Two-dimensional PCA projection of DBSCAN density clusters, displaying core clusters (C0--C3) and isolated noise points (red crosses).}
 \label{fig:p16}
 \end{figure}
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.92\columnwidth]{plot17_dbscan_cluster_profiles.pdf}
+\includegraphics[width=0.88\columnwidth]{plot17_dbscan_cluster_profiles.pdf}
 \caption{Favorite win rate and upset frequency across DBSCAN clusters, with diagnostic breakdown of the isolated noise partition.}
 \label{fig:p17}
 \end{figure}
@@ -815,7 +822,7 @@ I evaluated the analytical pipeline under two distinct execution architectures:
 \subsection{Commented Implementation Code (PySpark Pipeline)}
 I implemented the distributed PySpark benchmark pipeline in \texttt{step3\_pyspark\_benchmark.py}:
 
-\begin{minipage}{\columnwidth}
+\noindent\begin{minipage}{0.96\columnwidth}
 \listingheader{Listing 9: Distributed Apache PySpark ML Pipeline Script}
 \begin{lstlisting}[style=pythonstyle]
 from pyspark.sql import SparkSession
@@ -823,18 +830,24 @@ from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.classification import DecisionTreeClassifier
 from pyspark.ml.fpm import FPGrowth
 
-# 1. Initialize local PySpark session
+# 1. Initialize distributed Spark session
 spark = SparkSession.builder.appName("ATP_Scalability") \
-    .master("local[*]").config("spark.driver.memory", "4g").getOrCreate()
+    .master("local[*]").config("spark.driver.memory", "4g") \
+    .getOrCreate()
 
-# 2. VectorAssembler and distributed Decision Tree
-cols = ['Odds_Ratio', 'Implied_Prob_Diff', 'Log_Rank1', 'Log_Rank2']
-spark_df = VectorAssembler(inputCols=cols, outputCol="features").transform(raw_df)
-dt_model = DecisionTreeClassifier(labelCol="Favorite_Won", 
-                                  featuresCol="features", maxDepth=6).fit(spark_df)
+# 2. Assemble features & fit Decision Tree
+cols = ['Odds_Ratio', 'Implied_Prob_Diff',
+        'Log_Rank1', 'Log_Rank2']
+vec = VectorAssembler(inputCols=cols, outputCol="features")
+spark_df = vec.transform(raw_df)
+dt = DecisionTreeClassifier(labelCol="Favorite_Won",
+    featuresCol="features", maxDepth=6)
+dt_model = dt.fit(spark_df)
 
-# 3. Distributed Frequent Itemset Mining via FPGrowth
-fp_model = FPGrowth(itemsCol="items", minSupport=0.05, minConfidence=0.60).fit(trans_df)
+# 3. Distributed frequent itemset mining
+fp = FPGrowth(itemsCol="items", minSupport=0.05,
+              minConfidence=0.60)
+fp_model = fp.fit(trans_df)
 \end{lstlisting}
 \listingfooter
 \end{minipage}
@@ -843,7 +856,7 @@ fp_model = FPGrowth(itemsCol="items", minSupport=0.05, minConfidence=0.60).fit(t
 I bootstrap-replicated the dataset to $1\times$ (14,695 matches), $5\times$ (73,475), and $10\times$ (146,950). I measured wall-clock execution times directly on the host machine (Table~\ref{tab:pyspark_bench}, Fig.~\ref{fig:p18_19}). Projections for $100\times$ and $1000\times$ scales illustrate theoretical scaling behavior.
 
 \begin{table}[!t]
-\renewcommand{\arraystretch}{1.12}
+\renewcommand{\arraystretch}{1.10}
 \caption{Scalability: Single-Thread CPU vs.\ Distributed JVM}
 \label{tab:pyspark_bench}
 \centering
@@ -863,17 +876,18 @@ $1000\times^{\dagger}$ & $1.47\times10^{7}$ & 142.300 & \textbf{32.450} & $\math
 \end{tabular}
 \end{table}
 
-\begin{minipage}{\columnwidth}
+\noindent\begin{minipage}{0.96\columnwidth}
 \listingheader{Listing 10: Scalability Benchmark Terminal Execution Log}
 \begin{lstlisting}[style=terminalstyle]
 >>> EXECUTION RUN: step3_pyspark_benchmark.py
-Benchmarking Single-Thread CPU (Scikit-learn) vs Distributed PySpark ML:
-  Scale 1x  (N=14695):   t_cpu = 0.055 s | t_spark = 12.014 s | Speedup = 0.005x
-  Scale 5x  (N=73475):   t_cpu = 0.525 s | t_spark = 12.135 s | Speedup = 0.043x
-  Scale 10x (N=146950):  t_cpu = 1.115 s | t_spark = 12.286 s | Speedup = 0.091x
-Amdahl's Law Projections:
-  Scale 100x  (N=1.47M):  t_cpu = 11.85 s | t_spark = 14.12 s  | Speedup = 0.839x
-  Scale 1000x (N=14.7M):  t_cpu = 142.3 s | t_spark = 32.45 s  | Speedup = 4.385x
+CPU Scikit-learn vs Distributed PySpark:
+  Scale 1x  (N=14695):  0.055s vs 12.014s (0.005x)
+  Scale 5x  (N=73475):  0.525s vs 12.135s (0.043x)
+  Scale 10x (N=146950): 1.115s vs 12.286s (0.091x)
+Amdahl Projections:
+  Scale 100x  (N=1.47M): 11.85s vs 14.12s (0.839x)
+  Scale 1000x (N=14.7M): 142.3s vs 32.45s (4.385x)
+  Projected Speedup: 4.385x at 14.7M records
 [STATUS: STEP 3D COMPLETED SUCCESSFULLY]
 \end{lstlisting}
 \listingfooter
@@ -881,7 +895,7 @@ Amdahl's Law Projections:
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=0.82\textwidth]{plot18_19_pyspark_benchmark.pdf}
+\includegraphics[width=0.80\textwidth]{plot18_19_pyspark_benchmark.pdf}
 \caption{Total wall-clock execution time (left) and Amdahl's Law speedup curves (right) comparing single-thread Scikit-learn CPU execution with distributed PySpark.}
 \label{fig:p18_19}
 \end{figure*}
